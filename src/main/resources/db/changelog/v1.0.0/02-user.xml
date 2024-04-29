@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet id="02-01-users-table" author="wout">
+        <createTable tableName="users">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_user"/>
+            </column>
+
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="organization_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="activated" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="activation_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="password_reset_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="timestamp" defaultValueComputed="NOW()">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="updated_at" type="timestamp" defaultValueComputed="NOW()">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="02-02-users-relations" author="wout">
+        <addForeignKeyConstraint baseTableName="users" baseColumnNames="organization_id"
+                                 constraintName="fk_user_organization"
+                                 referencedTableName="organizations" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="03-03-user-data" author="wout" context="load-data">
+        <loadData tableName="users" file="db/data/user.csv" separator=";">
+            <column name="id" type="string"/>
+            <column name="email" type="string"/>
+            <column name="password" type="string"/>
+            <column name="name" type="string"/>
+            <column name="organization_id" type="string"/>
+            <column name="activated" type="boolean"/>
+            <column name="activation_code" type="string"/>
+            <column name="password_reset_code" type="string"/>
+        </loadData>
+    </changeSet>
+
+</databaseChangeLog>

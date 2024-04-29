@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+
+    <include file="db/changelog/v1.0.0/01-organization.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.0.0/02-user.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.0.0/03-user_role.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.0.0/04-game.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.0.0/05-user_invite.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.0.0/06-player.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.0.0/07-leaderboard.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.0.0/08-leaderboard_score.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.0.0/09-achievement.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.0.0/10-achievement_progress.xml" relativeToChangelogFile="false" />
+
+</databaseChangeLog>

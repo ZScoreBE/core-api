@@ -1,0 +1,3 @@
+id;email;name;password;organization_id;activated;activation_code;password_reset_code
+85bf7126-bae6-4597-979e-3fe9731420d0;wout@z-soft.be;wout;$2a$10$4j.M6TYRHHs3c8Fvq6QT2.4uOicojUI.jh00fMe8oRn88mvZ43.bC;8ba06c62-1752-42b4-afd8-b26f5e8cb0e7;true;activation_code_wout;pass_reset_code_wout
+b3bba7a8-0981-495d-8caf-260d68dc0de2;wout2@z-soft.be;wout2;$2a$10$4j.M6TYRHHs3c8Fvq6QT2.4uOicojUI.jh00fMe8oRn88mvZ43.bC;8ba06c62-1752-42b4-afd8-b26f5e8cb0e7;true;activation_code_wout2;pass_reset_code_wout2

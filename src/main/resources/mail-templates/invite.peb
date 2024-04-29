@@ -1,0 +1,26 @@
+    {% extends "./base.peb" %}
+
+{% block preheader %}
+You have been invited to Z-Score
+{% endblock %}
+
+{% block body %}
+<p>Hi {{ name }},</p>
+<p>You have been invited to Z-Score, to sign up with your invite code you can click the button below.</p>
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
+    <tbody>
+    <tr>
+        <td align="left">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                <tbody>
+                <tr>
+                    <td> <a href="{{ url }}" target="_blank">Sign up to Z-Score</a> </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<p>The Z-Score team</p>
+{% endblock %}

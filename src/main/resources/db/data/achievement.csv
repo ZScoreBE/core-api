@@ -1,0 +1,4 @@
+id;name;description;type;needed_count;game_id
+6f0c3edb-27ea-45b2-b19c-e0606f6bf44f;Achievment 1;Description 1;MULTIPLE;15;eceb45dd-8566-4164-835b-148390ac7afa
+aaa06a69-58c0-4549-bd98-5ec9c4acfae5;Achievment 2;Description 2;MULTIPLE;20;eceb45dd-8566-4164-835b-148390ac7afa
+0932945f-4b8e-4c34-9ec5-3097364ac8c6;Achievment 3;Description 3;SINGLE;;eceb45dd-8566-4164-835b-148390ac7afa

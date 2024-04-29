@@ -1,0 +1,207 @@
+openapi: 3.0.3
+info:
+  title: External API
+  description: Rest API to use in your games
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /external/achievements:
+    get:
+      summary: Get achievements
+      operationId: getAchievements
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - $ref: './external_api_common_components.yaml#/components/parameters/pageQueryParam'
+        - $ref: './external_api_common_components.yaml#/components/parameters/sizeQueryParam'
+      responses:
+        200:
+          description: The achievements
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AchievementProgressResponseList'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+
+  /external/achievements/{id}/complete:
+    patch:
+      summary: Complete an achievement
+      operationId: completeAchievement
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - in: path
+          name: id
+          required: true
+          description: The achievement ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: The updated achievement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AchievementProgressResponse'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+  /external/achievements/{id}/increase:
+    patch:
+      summary: Increase an achievements count
+      operationId: increaseAchievement
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - in: path
+          name: id
+          required: true
+          description: The achievement ID
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: amount
+          required: false
+          description: The amount you want to increase, by default this is 1
+          schema:
+            type: integer
+            default: 1
+      responses:
+        200:
+          description: The updated achievement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AchievementProgressResponse'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+  /external/achievements/{id}/decrease:
+    patch:
+      summary: Decrease an achievements count
+      operationId: decreaseAchievement
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - in: path
+          name: id
+          required: true
+          description: The achievement ID
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: amount
+          required: false
+          description: The amount you want to decrease, by default this is 1
+          schema:
+            type: integer
+            default: 1
+      responses:
+        200:
+          description: The updated achievement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AchievementProgressResponse'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    AchievementProgressResponse:
+      readOnly: true
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        description:
+          type: string
+          nullable: false
+        type:
+          type: string
+          nullable: false
+          enum: [ SINGLE, MULTIPLE ]
+        neededCount:
+          type: integer
+          nullable: true
+        currentCount:
+          type: integer
+          nullable: true
+        completed:
+          type: boolean
+          nullable: false
+
+    AchievementProgressResponseList:
+      readOnly: true
+      type: object
+      properties:
+        items:
+          type: array
+          nullable: false
+          items:
+            $ref: '#/components/schemas/AchievementProgressResponse'
+        currentPage:
+          type: integer
+          format: int32
+          nullable: false
+        count:
+          type: integer
+          format: int32
+          nullable: false
+        lastPage:
+          type: integer
+          format: int32
+          nullable: false
+        total:
+          type: integer
+          format: int64
+          nullable: false
+        links:
+          $ref: 'external_api_common_components.yaml#/components/schemas/PaginationLinks'

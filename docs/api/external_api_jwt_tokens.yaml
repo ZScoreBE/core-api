@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: External API
+  description: Rest API to use in your games
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /public/auth/token/for-player:
+    post:
+      summary: Get access & refresh tokens
+      description: Get access & refresh tokens in the jwt format
+      operationId: getTokensForPlayer
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenForPlayerRequest'
+      responses:
+        200:
+          description: The tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+  /public/auth/token/for-player/refresh:
+    post:
+      summary: Refresh tokens
+      operationId: refreshTokensForPlayer
+      tags:
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        200:
+          description: The tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    TokenForPlayerRequest:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          nullable: false
+
+    TokenResponse:
+      readOnly: true
+      type: object
+      properties:
+        accessToken:
+          type: string
+          nullable: false
+        refreshToken:
+          type: string
+          nullable: false

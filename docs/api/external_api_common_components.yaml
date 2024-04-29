@@ -1,0 +1,69 @@
+openapi: 3.0.3
+info:
+  title: Common components
+  version: 1.0.0
+paths: {}
+components:
+  parameters:
+    ApiKeyAuth:
+      name: Authorization
+      in: header
+      description: Provide your API key in the format 'ApiKey {{yourApiKey}}'
+      required: true
+      schema:
+        type: string
+    BearerJwtAuth:
+      name: Authorization
+      in: header
+      description: Provide your players JWT in the format 'Bearer {{playerJwt}}'
+      required: true
+      schema:
+        type: string
+    pageQueryParam:
+      in: query
+      name: page
+      schema:
+        type: integer
+      description: The current page
+    sizeQueryParam:
+      in: query
+      name: size
+      schema:
+        type: integer
+      description: The page size
+
+  schemas:
+    ErrorResponse:
+      readOnly: true
+      type: object
+      properties:
+        errorKey:
+          type: string
+          nullable: false
+        status:
+          type: integer
+          format: int32
+          nullable: false
+        detail:
+          type: string
+          nullable: false
+
+    PaginationLinks:
+      type: object
+      nullable: false
+      properties:
+        first:
+          type: string
+          nullable: false
+        last:
+          type: string
+          nullable: false
+        self:
+          type: string
+          nullable: false
+        prev:
+          type: string
+          nullable: true
+        next:
+          type: string
+          nullable: true

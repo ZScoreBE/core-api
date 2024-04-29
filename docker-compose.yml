@@ -1,0 +1,22 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: on-failure
+    environment:
+      - MYSQL_DATABASE=z-score
+      - MYSQL_ROOT_PASSWORD=z-score
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+
+  mailcatcher:
+    image: sj26/mailcatcher:v0.9.0
+    restart: on-failure
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+volumes:
+  db:
+    driver: local

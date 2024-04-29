@@ -1,0 +1,4 @@
+id;name;direction;score_type;game_id
+fec8c77e-8a87-4e85-b119-f4020bd74750;Leaderboard 1 (Latest);ASC;LATEST;eceb45dd-8566-4164-835b-148390ac7afa
+d5329300-f0ee-4fd4-af26-9f528f00e3c9;Leaderboard 2 (Highest);ASC;HIGHEST;eceb45dd-8566-4164-835b-148390ac7afa
+dac00eb9-daed-4771-942f-2eb55cb9480d;Leaderboard 3 (Multiple);ASC;MULTIPLE;eceb45dd-8566-4164-835b-148390ac7afa

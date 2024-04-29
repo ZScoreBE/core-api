@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet id="04-01-games-table" author="wout">
+        <createTable tableName="games">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_game"/>
+            </column>
+
+            <column name="generation_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="engine" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="organization_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="active" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="sandbox_mode" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="api_key" type="VARCHAR(75)">
+                <constraints nullable="false" unique="true" />
+            </column>
+
+            <column name="created_at" type="timestamp" defaultValueComputed="NOW()">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="updated_at" type="timestamp" defaultValueComputed="NOW()">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="04-02-games-relations" author="wout">
+        <addForeignKeyConstraint baseTableName="games" baseColumnNames="organization_id"
+                                 constraintName="fk_game_organization"
+                                 referencedTableName="organizations" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="04-03-game-data" author="wout" context="load-data">
+        <loadData tableName="games" file="db/data/game.csv" separator=";">
+            <column name="id" type="string"/>
+            <column name="generation_id" type="string"/>
+            <column name="name" type="string"/>
+            <column name="engine" type="string"/>
+            <column name="active" type="boolean"/>
+            <column name="sandbox_mode" type="boolean"/>
+            <column name="api_key" type="string"/>
+            <column name="organization_id" type="string"/>
+        </loadData>
+    </changeSet>
+
+</databaseChangeLog>

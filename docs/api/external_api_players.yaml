@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: External API
+  description: Rest API to use in your games
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /external/players:
+    post:
+      summary: Create a new player for you game
+      operationId: createPlayer
+      tags:
+        - Players
+      parameters:
+        - $ref: './external_api_common_components.yaml#/components/parameters/ApiKeyAuth'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlayerRequest'
+      responses:
+        201:
+          description: Player created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerResponse'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    PlayerRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          nullable: false
+          minLength: 1
+          maxLength: 255
+
+    PlayerResponse:
+      readOnly: true
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        lastSignIn:
+          type: string
+          nullable: true
+          pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$'

@@ -1,0 +1,228 @@
+openapi: 3.0.3
+info:
+  title: External API
+  description: Rest API to use in your games
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /external/leaderboards:
+    get:
+      summary: Get leaderboards
+      operationId: getLeaderboards
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - $ref: './external_api_common_components.yaml#/components/parameters/pageQueryParam'
+        - $ref: './external_api_common_components.yaml#/components/parameters/sizeQueryParam'
+      responses:
+        200:
+          description: The leaderboards
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardResponseList'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+  /external/leaderboards/{id}:
+    get:
+      summary: Get leaderboard
+      operationId: getLeaderboard
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - in: path
+          name: id
+          required: true
+          description: The leaderboard ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: The leaderboards
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardResponse'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+  /external/leaderboards/{id}/scores:
+    get:
+      summary: Get leaderboard scores
+      operationId: getLeaderboardScores
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - $ref: './external_api_common_components.yaml#/components/parameters/pageQueryParam'
+        - $ref: './external_api_common_components.yaml#/components/parameters/sizeQueryParam'
+        - in: path
+          name: id
+          required: true
+          description: The leaderboard ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: The leaderboard scores
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardScoreResponseList'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+    post:
+      summary: Add a new score
+      operationId: createLeaderboardScore
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - in: path
+          name: id
+          required: true
+          description: The leaderboard ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaderBoardScoreRequest'
+      responses:
+        201:
+          description: The created leaderboard score
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardScoreResponse'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    LeaderBoardScoreRequest:
+      type: object
+      required:
+        - score
+      properties:
+        score:
+          type: integer
+          nullable: false
+
+    LeaderboardResponse:
+      readOnly: true
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        direction:
+          type: string
+          nullable: false
+          enum: [ASC, DESC]
+        scoreType:
+          type: string
+          nullable: false
+          enum: [ LATEST, HIGHEST, MULTIPLE ]
+
+    LeaderboardResponseList:
+      readOnly: true
+      type: object
+      properties:
+        items:
+          type: array
+          nullable: false
+          items:
+            $ref: '#/components/schemas/LeaderboardResponse'
+        currentPage:
+          type: integer
+          format: int32
+          nullable: false
+        count:
+          type: integer
+          format: int32
+          nullable: false
+        lastPage:
+          type: integer
+          format: int32
+          nullable: false
+        total:
+          type: integer
+          format: int64
+          nullable: false
+        links:
+          $ref: 'external_api_common_components.yaml#/components/schemas/PaginationLinks'
+
+    LeaderboardScoreResponse:
+      readOnly: true
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        score:
+          type: integer
+          nullable: false
+        player:
+          $ref: 'external_api_players.yaml#/components/schemas/PlayerResponse'
+
+    LeaderboardScoreResponseList:
+      readOnly: true
+      type: object
+      properties:
+        items:
+          type: array
+          nullable: false
+          items:
+            $ref: '#/components/schemas/LeaderboardScoreResponse'
+        currentPage:
+          type: integer
+          format: int32
+          nullable: false
+        count:
+          type: integer
+          format: int32
+          nullable: false
+        lastPage:
+          type: integer
+          format: int32
+          nullable: false
+        total:
+          type: integer
+          format: int64
+          nullable: false
+        links:
+          $ref: 'external_api_common_components.yaml#/components/schemas/PaginationLinks'

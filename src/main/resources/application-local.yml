@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/z-score
+    username: root
+    password: z-score
+
+  liquibase:
+    contexts: load-data
+
+  mail:
+    host: localhost
+    port: 1025
+    username:
+    password:
+    properties:
+      smtp:
+        auth: false
+        starttls:
+          enable: false
+
+zscore:
+  cors:
+    allowed-origins:
+      - http://localhost:4200
+  security:
+    token:
+      secret: 29e38284-4646-47e3-8087-571fdf0a1a0e_f2468472-b35d-48e7-a334-d0cf88d6f696
+      token-expiry-duration: 1
+      refresh-token-expiry-duration: 48
+      player-token-expiry-duration: 720 # 30 Days
+      player-refresh-token-expiry-duration: 2160 # 90 Days
+  email:
+    override-classpath-templates: false
+    no-reply-email: no-reply@z-soft.be
+    no-reply-name: No-Reply
+    activation-frontend-url: http://localhost:4200/action/activate
+    reset-password-frontend-url: http://localhost:4200/action/reset-password
+    register-frontend-url: http://localhost:4200/sign-up
