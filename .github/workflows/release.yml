@@ -7,34 +7,8 @@ on:
       - '*'
 
 jobs:
-#  build:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/checkout@v4
-#
-#      - name: Set up Java for building
-#        uses: actions/setup-java@v3
-#        with:
-#          java-version: 21
-#          distribution: 'temurin'
-#          cache: maven
-#
-#      - name: Build with Maven
-#        run: mvn clean package
-#
-#      - name: Copy jar file
-#        run: mv target/zscore-core.jar app.jar
-#
-#      - name: Save artifact
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: jar-file
-#          path: app.jar
-
-  release:
+  build:
     runs-on: ubuntu-latest
-#    needs: build
 
     steps:
       - uses: actions/checkout@v4
@@ -52,11 +26,24 @@ jobs:
       - name: Copy jar file
         run: mv target/zscore-core.jar app.jar
 
-#      - name: Retrieve artifact
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: jar-file
-#          path: app.jar
+      - name: Save artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jar-file
+          path: app.jar
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Retrieve artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jar-file
+          path: app.jar
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -73,5 +60,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
+          context: .
           push: true
           tags: zsoftbe/z-score-core-api:latest,zsoftbe/z-score-core-api:${{ github.ref_name }}
