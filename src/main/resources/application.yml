@@ -54,3 +54,4 @@ zscore:
     no-reply-name: ${ZSCORE_EMAIL_NO_REPLY_NAME}
     activation-frontend-url: ${ZSCORE_EMAIL_ACTIVATION_URL}
     reset-password-frontend-url: ${ZSCORE_EMAIL_RESET_PASSWORD_URL}
+    register-frontend-url: ${ZSCORE_EMAIL_REGISTER_URL}
