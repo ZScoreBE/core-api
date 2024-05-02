@@ -48,8 +48,8 @@ zscore:
       player-token-expiry-duration: ${ZSCORE_PLAYER_TOKEN_EXPIRY_DURATION}
       player-refresh-token-expiry-duration: ${ZSCORE_PLAYER_REFRESH_TOKEN_EXPIRY_DURATION}
   email:
-    override-classpath-templates: ${ZSCORE_EMAIL_OVERRIDE_TEMPLATES:-false}
-    absolute-email-templates-path: ${ZSCORE_EMAIL_TEMPLATES_PATH:-''}
+    override-classpath-templates: ${ZSCORE_EMAIL_OVERRIDE_TEMPLATES:false}
+    absolute-email-templates-path: ${ZSCORE_EMAIL_TEMPLATES_PATH:''}
     no-reply-email: ${ZSCORE_EMAIL_NO_REPLY}
     no-reply-name: ${ZSCORE_EMAIL_NO_REPLY_NAME}
     activation-frontend-url: ${ZSCORE_EMAIL_ACTIVATION_URL}
