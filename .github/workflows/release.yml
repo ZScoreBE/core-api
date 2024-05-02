@@ -58,5 +58,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: zsoftbe/z-score-core-api:latest,zsoftbe/z-score-core-api:${{ github.ref_name }}
