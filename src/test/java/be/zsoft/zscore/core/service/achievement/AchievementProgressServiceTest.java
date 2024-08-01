@@ -5,9 +5,10 @@ import be.zsoft.zscore.core.common.exception.ApiException;
 import be.zsoft.zscore.core.common.exception.NotFoundException;
 import be.zsoft.zscore.core.entity.achievement.Achievement;
 import be.zsoft.zscore.core.entity.achievement.AchievementProgress;
-import be.zsoft.zscore.core.entity.achievement.AchievementType;
-import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.entity.player.Player;
+import be.zsoft.zscore.core.fixtures.achievement.AchievementFixture;
+import be.zsoft.zscore.core.fixtures.achievement.AchievementProgressFixture;
+import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
 import be.zsoft.zscore.core.repository.achievement.AchievementProgressRepo;
 import be.zsoft.zscore.core.service.player.PlayerService;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -52,18 +52,11 @@ class AchievementProgressServiceTest {
 
     @Test
     void createAchievementProgressesForNewPlayer() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Player player = Player.builder().id(UUID.randomUUID()).game(game).build();
-        Achievement achievement1 = Achievement.builder()
-                .id(UUID.randomUUID())
-                .type(AchievementType.MULTIPLE)
-                .build();
-        Achievement achievement2 = Achievement.builder()
-                .id(UUID.randomUUID())
-                .type(AchievementType.SINGLE)
-                .build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Achievement achievement1 = AchievementFixture.aMultipleAchievement();
+        Achievement achievement2 = AchievementFixture.aSingleAchievement();
 
-        when(achievementService.getAllAchievementsByGame(game)).thenReturn(List.of(achievement1, achievement2));
+        when(achievementService.getAllAchievementsByGame(player.getGame())).thenReturn(List.of(achievement1, achievement2));
 
         achievementProgressService.createAchievementProgressesForNewPlayer(player);
 
@@ -82,9 +75,9 @@ class AchievementProgressServiceTest {
 
     @Test
     void completeAchievement_success() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).build();
-        AchievementProgress expected = AchievementProgress.builder().id(UUID.randomUUID()).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Achievement achievement = AchievementFixture.aDefaultAchievement();
+        AchievementProgress expected = AchievementProgressFixture.aDefaultAchievementProgress();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(achievementProgressRepo.findByAchievementAndPlayer(achievement, player)).thenReturn(Optional.of(expected));
@@ -100,8 +93,8 @@ class AchievementProgressServiceTest {
 
     @Test
     void completeAchievement_notFound() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Achievement achievement = AchievementFixture.aDefaultAchievement();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(achievementProgressRepo.findByAchievementAndPlayer(achievement, player)).thenReturn(Optional.empty());
@@ -113,7 +106,7 @@ class AchievementProgressServiceTest {
 
     @Test
     void increaseAchievementCount_singleType() {
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).type(AchievementType.SINGLE).build();
+        Achievement achievement = AchievementFixture.aSingleAchievement();
 
         ApiException ex = assertThrows(ApiException.class, () -> achievementProgressService.increaseAchievementCount(1, achievement));
 
@@ -124,8 +117,8 @@ class AchievementProgressServiceTest {
 
     @Test
     void increaseAchievementCount_notFound() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).type(AchievementType.MULTIPLE).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Achievement achievement = AchievementFixture.aMultipleAchievement();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(achievementProgressRepo.findByAchievementAndPlayer(achievement, player)).thenReturn(Optional.empty());
@@ -137,9 +130,9 @@ class AchievementProgressServiceTest {
 
     @Test
     void increaseAchievementCount_alreadyCompleted() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).type(AchievementType.MULTIPLE).neededCount(20).build();
-        AchievementProgress progress = AchievementProgress.builder().completed(true).currentCount(10).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Achievement achievement = AchievementFixture.aMultipleAchievement();
+        AchievementProgress progress = AchievementProgressFixture.aCompletedAchievementProgress();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(achievementProgressRepo.findByAchievementAndPlayer(achievement, player)).thenReturn(Optional.of(progress));
@@ -153,9 +146,9 @@ class AchievementProgressServiceTest {
 
     @Test
     void increaseAchievementCount_newCountGreaterThanNeededCount() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).type(AchievementType.MULTIPLE).neededCount(20).build();
-        AchievementProgress expected = AchievementProgress.builder().completed(false).currentCount(10).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Achievement achievement = AchievementFixture.aMultipleAchievement();
+        AchievementProgress expected = AchievementProgressFixture.aDefaultAchievementProgress();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(achievementProgressRepo.findByAchievementAndPlayer(achievement, player)).thenReturn(Optional.of(expected));
@@ -172,9 +165,9 @@ class AchievementProgressServiceTest {
 
     @Test
     void increaseAchievementCount_normalIncrease() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).type(AchievementType.MULTIPLE).neededCount(20).build();
-        AchievementProgress expected = AchievementProgress.builder().completed(false).currentCount(10).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Achievement achievement = AchievementFixture.aDefaultAchievement();
+        AchievementProgress expected = AchievementProgressFixture.aDefaultAchievementProgress();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(achievementProgressRepo.findByAchievementAndPlayer(achievement, player)).thenReturn(Optional.of(expected));
@@ -191,7 +184,7 @@ class AchievementProgressServiceTest {
 
     @Test
     void decreaseAchievementCount_singleType() {
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).type(AchievementType.SINGLE).build();
+        Achievement achievement = AchievementFixture.aSingleAchievement();
 
         ApiException ex = assertThrows(ApiException.class, () -> achievementProgressService.decreaseAchievementCount(1, achievement));
 
@@ -202,8 +195,8 @@ class AchievementProgressServiceTest {
 
     @Test
     void decreaseAchievementCount_notFound() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).type(AchievementType.MULTIPLE).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Achievement achievement = AchievementFixture.aMultipleAchievement();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(achievementProgressRepo.findByAchievementAndPlayer(achievement, player)).thenReturn(Optional.empty());
@@ -215,9 +208,9 @@ class AchievementProgressServiceTest {
 
     @Test
     void decreaseAchievementCount_alreadyCompleted() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).type(AchievementType.MULTIPLE).neededCount(20).build();
-        AchievementProgress progress = AchievementProgress.builder().completed(true).currentCount(10).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Achievement achievement = AchievementFixture.aMultipleAchievement();
+        AchievementProgress progress = AchievementProgressFixture.aCompletedAchievementProgress();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(achievementProgressRepo.findByAchievementAndPlayer(achievement, player)).thenReturn(Optional.of(progress));
@@ -231,9 +224,9 @@ class AchievementProgressServiceTest {
 
     @Test
     void decreaseAchievementCount_newCountSmallerThanZero() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).type(AchievementType.MULTIPLE).neededCount(20).build();
-        AchievementProgress expected = AchievementProgress.builder().completed(false).currentCount(10).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Achievement achievement = AchievementFixture.aMultipleAchievement();
+        AchievementProgress expected = AchievementProgressFixture.aDefaultAchievementProgress();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(achievementProgressRepo.findByAchievementAndPlayer(achievement, player)).thenReturn(Optional.of(expected));
@@ -249,9 +242,9 @@ class AchievementProgressServiceTest {
 
     @Test
     void decreaseAchievementCount_normalDecrease() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).type(AchievementType.MULTIPLE).neededCount(20).build();
-        AchievementProgress expected = AchievementProgress.builder().completed(false).currentCount(10).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Achievement achievement = AchievementFixture.aMultipleAchievement();
+        AchievementProgress expected = AchievementProgressFixture.aDefaultAchievementProgress();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(achievementProgressRepo.findByAchievementAndPlayer(achievement, player)).thenReturn(Optional.of(expected));
@@ -267,11 +260,11 @@ class AchievementProgressServiceTest {
 
     @Test
     void getAchievementProgresses() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
+        Player player = PlayerFixture.aDefaultPlayer();
         Pageable pageable = PageRequest.of(1, 10);
         Page<AchievementProgress> expected = new PageImpl<>(List.of(
-           AchievementProgress.builder().id(UUID.randomUUID()).build(),
-           AchievementProgress.builder().id(UUID.randomUUID()).build()
+                AchievementProgressFixture.aDefaultAchievementProgress(),
+                AchievementProgressFixture.aDefaultAchievementProgress()
         ));
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
@@ -286,7 +279,7 @@ class AchievementProgressServiceTest {
 
     @Test
     void deleteAllProgressesByPlayer() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
+        Player player = PlayerFixture.aDefaultPlayer();
 
         achievementProgressService.deleteAllProgressesByPlayer(player);
 

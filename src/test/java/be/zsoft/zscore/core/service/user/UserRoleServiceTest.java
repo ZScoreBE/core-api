@@ -3,6 +3,7 @@ package be.zsoft.zscore.core.service.user;
 import be.zsoft.zscore.core.entity.user.Role;
 import be.zsoft.zscore.core.entity.user.User;
 import be.zsoft.zscore.core.entity.user.UserRole;
+import be.zsoft.zscore.core.fixtures.user.UserFixture;
 import be.zsoft.zscore.core.repository.user.UserRoleRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,9 +12,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,21 +28,20 @@ class UserRoleServiceTest {
 
     @Test
     void addRole_shouldAddRole() {
-        User user = User.builder().id(UUID.fromString("c149c35a-1de5-4be8-ac7b-2c99ce79cd75")).roles(List.of()).build();
+        User user = UserFixture.aDefaultUser();
 
-        userRoleService.addRole(user, Role.ROLE_USER);
+        userRoleService.addRole(user, Role.ROLE_ORGANIZATION_ADMIN);
 
         verify(userRoleRepo).saveAndFlush(any(UserRole.class));
     }
 
     @Test
     void addRole_shouldNotAddRoleIfItExists() {
-        User user = User.builder().roles(List.of(UserRole.builder().role(Role.ROLE_USER).build())).build();
-        UserRole userRole = UserRole.builder().user(user).role(Role.ROLE_USER).build();
+        User user = UserFixture.aDefaultUser();
 
         userRoleService.addRole(user, Role.ROLE_USER);
 
-        verify(userRoleRepo, never()).saveAndFlush(userRole);
+        verify(userRoleRepo, never()).saveAndFlush(any(UserRole.class));
     }
 
     @Test

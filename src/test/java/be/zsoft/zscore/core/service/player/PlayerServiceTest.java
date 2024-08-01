@@ -1,15 +1,17 @@
-package be.zsoft.zscore.core.service;
+package be.zsoft.zscore.core.service.player;
 
 import be.zsoft.zscore.core.common.exception.NotFoundException;
 import be.zsoft.zscore.core.dto.mapper.player.PlayerMapper;
 import be.zsoft.zscore.core.dto.request.player.PlayerRequest;
 import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.entity.player.Player;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
+import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
+import be.zsoft.zscore.core.fixtures.player.PlayerRequestFixtures;
 import be.zsoft.zscore.core.repository.player.PlayerRepo;
 import be.zsoft.zscore.core.security.dto.AuthenticationData;
 import be.zsoft.zscore.core.security.dto.ZScoreAuthenticationToken;
 import be.zsoft.zscore.core.service.game.GameService;
-import be.zsoft.zscore.core.service.player.PlayerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,9 +69,9 @@ class PlayerServiceTest {
 
     @Test
     void createPlayer() {
-        PlayerRequest request = new PlayerRequest("wout");
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        PlayerRequest request = PlayerRequestFixtures.aDefaultPlayerRequest();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Game game = GameFixture.aDefaultGame();
 
         when(playerMapper.fromRequest(request)).thenReturn(player);
         when(gameService.getAuthenicatedGame()).thenReturn(game);
@@ -90,7 +92,7 @@ class PlayerServiceTest {
     @Test
     void getPlayerById_success() {
         UUID id = UUID.randomUUID();
-        Player player = Player.builder().id(id).build();
+        Player player = PlayerFixture.aDefaultPlayer();
 
         when(playerRepo.findById(id)).thenReturn(Optional.of(player));
 
@@ -115,8 +117,8 @@ class PlayerServiceTest {
     @Test
     void getPlayerByIdAndGame_success() {
         UUID id = UUID.randomUUID();
-        Player player = Player.builder().id(id).build();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Game game = GameFixture.aDefaultGame();
 
         when(playerRepo.findByIdAndGame(id, game)).thenReturn(Optional.of(player));
 
@@ -130,7 +132,7 @@ class PlayerServiceTest {
     @Test
     void getPlayerByIdAndGame_notFound() {
         UUID id = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
 
         when(playerRepo.findByIdAndGame(id, game)).thenReturn(Optional.empty());
 
@@ -141,11 +143,11 @@ class PlayerServiceTest {
 
     @Test
     void getPlayersByGame() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         Pageable pageable = PageRequest.of(1, 10);
         Page<Player> expected = new PageImpl<>(List.of(
-           Player.builder().id(UUID.randomUUID()).build(),
-           Player.builder().id(UUID.randomUUID()).build()
+                PlayerFixture.aDefaultPlayer(),
+                PlayerFixture.aDefaultPlayer()
         ));
 
         when(playerRepo.findAllByGame(game, pageable)).thenReturn(expected);
@@ -160,11 +162,11 @@ class PlayerServiceTest {
     @Test
     void searchPlayersByGame() {
         String search = "search";
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         Pageable pageable = PageRequest.of(1, 10);
         Page<Player> expected = new PageImpl<>(List.of(
-                Player.builder().id(UUID.randomUUID()).build(),
-                Player.builder().id(UUID.randomUUID()).build()
+                PlayerFixture.aDefaultPlayer(),
+                PlayerFixture.aDefaultPlayer()
         ));
 
         when(playerRepo.searchAllOnNameByGame("%" + search + "%", game, pageable)).thenReturn(expected);
@@ -178,7 +180,7 @@ class PlayerServiceTest {
 
     @Test
     void rawUpdate() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
+        Player player = PlayerFixture.aDefaultPlayer();
 
         playerService.rawUpdate(player);
 
@@ -187,7 +189,7 @@ class PlayerServiceTest {
 
     @Test
     void getAuthenticatedPlayer_success() {
-        Player expected = Player.builder().id(UUID.randomUUID()).build();
+        Player expected = PlayerFixture.aDefaultPlayer();
         Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, expected,null, null), "", null);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -206,7 +208,7 @@ class PlayerServiceTest {
 
     @Test
     void countPlayersByGame() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         long expected = 10;
 
         when(playerRepo.countByGame(game)).thenReturn(expected);
@@ -219,7 +221,7 @@ class PlayerServiceTest {
 
     @Test
     void deletePlayer() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
+        Player player = PlayerFixture.aDefaultPlayer();
 
         playerService.deletePlayer(player);
 

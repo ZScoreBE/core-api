@@ -6,11 +6,14 @@ import be.zsoft.zscore.core.dto.mapper.leaderboard.LeaderboardScoreMapper;
 import be.zsoft.zscore.core.dto.request.leaderboard.ExternalLeaderboardScoreRequest;
 import be.zsoft.zscore.core.dto.response.leaderboard.LeaderboardResponse;
 import be.zsoft.zscore.core.dto.response.leaderboard.LeaderboardScoreResponse;
-import be.zsoft.zscore.core.dto.response.player.PlayerResponse;
 import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.entity.leaderboard.Leaderboard;
 import be.zsoft.zscore.core.entity.leaderboard.LeaderboardScore;
-import be.zsoft.zscore.core.entity.leaderboard.LeaderboardScoreType;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
+import be.zsoft.zscore.core.fixtures.leaderboard.LeaderboardFixture;
+import be.zsoft.zscore.core.fixtures.leaderboard.LeaderboardResponseFixture;
+import be.zsoft.zscore.core.fixtures.leaderboard.LeaderboardScoreFixture;
+import be.zsoft.zscore.core.fixtures.leaderboard.LeaderboardScoreResponseFixture;
 import be.zsoft.zscore.core.service.game.GameService;
 import be.zsoft.zscore.core.service.leaderboard.LeaderboardScoreService;
 import be.zsoft.zscore.core.service.leaderboard.LeaderboardService;
@@ -19,9 +22,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,12 +61,12 @@ class ExternalLeaderboardControllerTest {
         Game game = Game.builder().id(gameId).build();
         Pageable pageable = PageRequest.of(1, 10);
         Page<Leaderboard> leaderboards = new PageImpl<>(List.of(
-                Leaderboard.builder().id(UUID.randomUUID()).build(),
-                Leaderboard.builder().id(UUID.randomUUID()).build()
+                LeaderboardFixture.aDefaultLeaderboard(),
+                LeaderboardFixture.aDefaultLeaderboard()
         ));
         Page<LeaderboardResponse> expected = new PageImpl<>(List.of(
-                new LeaderboardResponse(UUID.randomUUID(), "leaderboard", Sort.Direction.ASC, LeaderboardScoreType.HIGHEST),
-                new LeaderboardResponse(UUID.randomUUID(), "leaderboard", Sort.Direction.ASC, LeaderboardScoreType.HIGHEST)
+                LeaderboardResponseFixture.aDefaultLeaderboardResponse(),
+                LeaderboardResponseFixture.aDefaultLeaderboardResponse()
         ));
 
         when(gameService.getAuthenicatedGame()).thenReturn(game);
@@ -81,9 +86,9 @@ class ExternalLeaderboardControllerTest {
     void getLeaderboard() {
         UUID gameId = UUID.randomUUID();
         UUID leaderboardId = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).build();
-        LeaderboardResponse expected = new LeaderboardResponse(UUID.randomUUID(), "leaderboard", Sort.Direction.ASC, LeaderboardScoreType.HIGHEST);
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard leaderboard = LeaderboardFixture.aDefaultLeaderboard();
+        LeaderboardResponse expected = LeaderboardResponseFixture.aDefaultLeaderboardResponse();
 
         when(gameService.getAuthenicatedGame()).thenReturn(game);
         when(leaderboardService.getLeaderboardById(game, leaderboardId)).thenReturn(leaderboard);
@@ -101,11 +106,11 @@ class ExternalLeaderboardControllerTest {
     void createLeaderboardScore() {
         UUID gameId = UUID.randomUUID();
         UUID leaderboardId = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard leaderboard = LeaderboardFixture.aDefaultLeaderboard();
         ExternalLeaderboardScoreRequest request = new ExternalLeaderboardScoreRequest(100);
-        LeaderboardScore score = LeaderboardScore.builder().id(UUID.randomUUID()).build();
-        LeaderboardScoreResponse expected = new LeaderboardScoreResponse(UUID.randomUUID(), 100, new PlayerResponse(UUID.randomUUID(), "wout", LocalDateTime.now()));
+        LeaderboardScore score = LeaderboardScoreFixture.aDefaultLeaderboardScore();
+        LeaderboardScoreResponse expected = LeaderboardScoreResponseFixture.aDefaultLeaderboardScoreResponse();
 
         when(gameService.getAuthenicatedGame()).thenReturn(game);
         when(leaderboardService.getLeaderboardById(game, leaderboardId)).thenReturn(leaderboard);
@@ -126,16 +131,16 @@ class ExternalLeaderboardControllerTest {
     void getLeaderboardScores() {
         UUID gameId = UUID.randomUUID();
         UUID leaderboardId = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard leaderboard = LeaderboardFixture.aDefaultLeaderboard();
         Pageable pageable = PageRequest.of(1, 10);
         Page<LeaderboardScore> leaderboardScores = new PageImpl<>(List.of(
-                LeaderboardScore.builder().id(UUID.randomUUID()).build(),
-                LeaderboardScore.builder().id(UUID.randomUUID()).build()
+                LeaderboardScoreFixture.aDefaultLeaderboardScore(),
+                LeaderboardScoreFixture.aDefaultLeaderboardScore()
         ));
         Page<LeaderboardScoreResponse> expected = new PageImpl<>(List.of(
-                new LeaderboardScoreResponse(UUID.randomUUID(), 100, new PlayerResponse(UUID.randomUUID(), "wout", LocalDateTime.now())),
-                new LeaderboardScoreResponse(UUID.randomUUID(), 100, new PlayerResponse(UUID.randomUUID(), "wout", LocalDateTime.now()))
+                LeaderboardScoreResponseFixture.aDefaultLeaderboardScoreResponse(),
+                LeaderboardScoreResponseFixture.aDefaultLeaderboardScoreResponse()
         ));
 
         when(gameService.getAuthenicatedGame()).thenReturn(game);

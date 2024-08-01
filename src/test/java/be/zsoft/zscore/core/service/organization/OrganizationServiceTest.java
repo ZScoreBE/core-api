@@ -6,6 +6,9 @@ import be.zsoft.zscore.core.dto.mapper.organization.OrganizationMapper;
 import be.zsoft.zscore.core.dto.request.organization.OrganizationRequest;
 import be.zsoft.zscore.core.entity.organization.Organization;
 import be.zsoft.zscore.core.entity.user.User;
+import be.zsoft.zscore.core.fixtures.organization.OrganizationFixture;
+import be.zsoft.zscore.core.fixtures.organization.OrganizationRequestFixture;
+import be.zsoft.zscore.core.fixtures.user.UserFixture;
 import be.zsoft.zscore.core.repository.organization.OrganizationRepo;
 import be.zsoft.zscore.core.security.dto.AuthenticationData;
 import be.zsoft.zscore.core.security.dto.ZScoreAuthenticationToken;
@@ -37,9 +40,9 @@ class OrganizationServiceTest {
     private OrganizationService organizationService;
 
     @Test
-    void createOrganization() {
-        OrganizationRequest request = new OrganizationRequest("org");
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+    void shouldCreateOrganization() {
+        OrganizationRequest request = OrganizationRequestFixture.aDefaultOrganizationRequest();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
 
         when(organizationMapper.fromRequest(request)).thenReturn(organization);
         when(organizationRepo.saveAndFlush(organization)).thenReturn(organization);
@@ -53,16 +56,16 @@ class OrganizationServiceTest {
     }
 
     @Test
-    void createOrganization_requestNull() {
+    void shouldThrowApiExceptionWhenNameIsNull() {
         ApiException ex = assertThrows(ApiException.class, () -> organizationService.createOrganization(null));
 
         assertEquals(ErrorCodes.ORGANIZATION_NAME_IS_REQUIRED, ex.getErrorKey());
     }
 
     @Test
-    void getMyOrganization_success() {
-        Organization expected = Organization.builder().id(UUID.randomUUID()).build();
-        User user = User.builder().id(UUID.randomUUID()).organization(expected).build();
+    void shouldGetMyOrganization() {
+        Organization expected = OrganizationFixture.aDefaultOrganization();
+        User user = UserFixture.aDefaultUser();
 
         Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(user, null, null, expected), "token", null);
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -82,8 +85,8 @@ class OrganizationServiceTest {
 
     @Test
     void updateMyOrganization() {
-        OrganizationRequest request = new OrganizationRequest("newOrg");
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        OrganizationRequest request = OrganizationRequestFixture.aDefaultOrganizationRequest();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
         User user = User.builder().id(UUID.randomUUID()).organization(organization).build();
 
         Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(user, null, null, organization), "token", null);

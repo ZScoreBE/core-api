@@ -4,6 +4,9 @@ import be.zsoft.zscore.core.dto.mapper.player.PlayerMapper;
 import be.zsoft.zscore.core.dto.request.player.PlayerRequest;
 import be.zsoft.zscore.core.dto.response.player.PlayerResponse;
 import be.zsoft.zscore.core.entity.player.Player;
+import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
+import be.zsoft.zscore.core.fixtures.player.PlayerRequestFixtures;
+import be.zsoft.zscore.core.fixtures.player.PlayerResponseFixture;
 import be.zsoft.zscore.core.service.achievement.AchievementProgressService;
 import be.zsoft.zscore.core.service.player.PlayerService;
 import org.junit.jupiter.api.Test;
@@ -11,9 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -36,9 +36,9 @@ class ExternalPlayerControllerTest {
 
     @Test
     void createPlayer() {
-        PlayerRequest request = new PlayerRequest("Wout");
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        PlayerResponse expected = new PlayerResponse(UUID.randomUUID(), "Wout", LocalDateTime.now());
+        PlayerRequest request = PlayerRequestFixtures.aDefaultPlayerRequest();
+        Player player = PlayerFixture.aDefaultPlayer();
+        PlayerResponse expected = PlayerResponseFixture.aDefaultPlayerResponse();
 
         when(playerService.createPlayer(request)).thenReturn(player);
         when(playerMapper.toResponse(player)).thenReturn(expected);

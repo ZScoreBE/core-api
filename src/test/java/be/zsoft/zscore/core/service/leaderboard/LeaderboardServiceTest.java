@@ -5,14 +5,19 @@ import be.zsoft.zscore.core.dto.mapper.leaderboard.LeaderboardMapper;
 import be.zsoft.zscore.core.dto.request.leaderboard.LeaderboardRequest;
 import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.entity.leaderboard.Leaderboard;
-import be.zsoft.zscore.core.entity.leaderboard.LeaderboardScoreType;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
+import be.zsoft.zscore.core.fixtures.leaderboard.LeaderboardFixture;
+import be.zsoft.zscore.core.fixtures.leaderboard.LeaderboardRequestFixture;
 import be.zsoft.zscore.core.repository.leaderboard.LeaderboardRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,10 +45,10 @@ class LeaderboardServiceTest {
 
     @Test
     void createLeaderboard() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        LeaderboardRequest request = new LeaderboardRequest("leaderboard", Sort.Direction.ASC, LeaderboardScoreType.HIGHEST);
-        Leaderboard leaderboardFromMapper = Leaderboard.builder().id(UUID.randomUUID()).build();
-        Leaderboard expected = Leaderboard.builder().id(UUID.randomUUID()).game(game).build();
+        Game game = GameFixture.aDefaultGame();
+        LeaderboardRequest request = LeaderboardRequestFixture.aDefaultLeaderboardRequest();
+        Leaderboard leaderboardFromMapper = LeaderboardFixture.aDefaultLeaderboard();
+        Leaderboard expected = LeaderboardFixture.aDefaultLeaderboard();
 
         when(leaderboardMapper.fromRequest(request)).thenReturn(leaderboardFromMapper);
         when(leaderboardRepo.saveAndFlush(leaderboardFromMapper)).thenReturn(expected);
@@ -59,8 +64,8 @@ class LeaderboardServiceTest {
     @Test
     void getLeaderboardById_success() {
         UUID leaderboardId = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Leaderboard expected = Leaderboard.builder().id(leaderboardId).game(game).build();
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard expected = LeaderboardFixture.aDefaultLeaderboard();
 
         when(leaderboardRepo.findByIdAndGame(leaderboardId, game)).thenReturn(Optional.of(expected));
 
@@ -72,7 +77,7 @@ class LeaderboardServiceTest {
     @Test
     void getLeaderboardById_notFound() {
         UUID leaderboardId = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
 
         when(leaderboardRepo.findByIdAndGame(leaderboardId, game)).thenReturn(Optional.empty());
 
@@ -82,9 +87,9 @@ class LeaderboardServiceTest {
     @Test
     void updateLeaderboard() {
         UUID leaderboardId = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Leaderboard expected = Leaderboard.builder().id(leaderboardId).game(game).build();
-        LeaderboardRequest request = new LeaderboardRequest("leaderboard", Sort.Direction.ASC, LeaderboardScoreType.HIGHEST);
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard expected = LeaderboardFixture.aDefaultLeaderboard();
+        LeaderboardRequest request = LeaderboardRequestFixture.aDefaultLeaderboardRequest();
 
         when(leaderboardRepo.findByIdAndGame(leaderboardId, game)).thenReturn(Optional.of(expected));
         when(leaderboardMapper.fromRequest(request, expected)).thenReturn(expected);
@@ -102,8 +107,8 @@ class LeaderboardServiceTest {
     @Test
     void deleteLeaderboard() {
         UUID leaderboardId = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(leaderboardId).game(game).build();
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard leaderboard = LeaderboardFixture.aDefaultLeaderboard();
 
         when(leaderboardRepo.findByIdAndGame(leaderboardId, game)).thenReturn(Optional.of(leaderboard));
 
@@ -116,11 +121,11 @@ class LeaderboardServiceTest {
 
     @Test
     void getLeaderboardsByGame() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         Pageable pageable = PageRequest.of(1, 10);
         Page<Leaderboard> expected = new PageImpl<>(List.of(
-                Leaderboard.builder().id(UUID.randomUUID()).build(),
-                Leaderboard.builder().id(UUID.randomUUID()).build()
+                LeaderboardFixture.aDefaultLeaderboard(),
+                LeaderboardFixture.aDefaultLeaderboard()
         ));
 
         when(leaderboardRepo.findAllByGame(game, pageable)).thenReturn(expected);
@@ -133,11 +138,11 @@ class LeaderboardServiceTest {
 
     @Test
     void searchLeaderboardsByGame() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         Pageable pageable = PageRequest.of(1, 10);
         Page<Leaderboard> expected = new PageImpl<>(List.of(
-                Leaderboard.builder().id(UUID.randomUUID()).build(),
-                Leaderboard.builder().id(UUID.randomUUID()).build()
+                LeaderboardFixture.aDefaultLeaderboard(),
+                LeaderboardFixture.aDefaultLeaderboard()
         ));
 
         when(leaderboardRepo.searchOnNameAllByGame("%test%", game, pageable)).thenReturn(expected);
@@ -150,7 +155,7 @@ class LeaderboardServiceTest {
 
     @Test
     void countLeaderboardsByGame() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         long expected = 10;
 
         when(leaderboardRepo.countByGame(game)).thenReturn(expected);

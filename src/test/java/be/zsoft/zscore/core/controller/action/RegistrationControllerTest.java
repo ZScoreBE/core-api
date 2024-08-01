@@ -7,6 +7,11 @@ import be.zsoft.zscore.core.dto.request.user.UserRequest;
 import be.zsoft.zscore.core.dto.response.organization.OrganizationResponse;
 import be.zsoft.zscore.core.entity.organization.Organization;
 import be.zsoft.zscore.core.entity.user.UserInvite;
+import be.zsoft.zscore.core.fixtures.organization.OrganizationFixture;
+import be.zsoft.zscore.core.fixtures.organization.OrganizationRequestFixture;
+import be.zsoft.zscore.core.fixtures.organization.OrganizationResponseFixture;
+import be.zsoft.zscore.core.fixtures.user.UserInviteFixture;
+import be.zsoft.zscore.core.fixtures.user.UserRequestFixture;
 import be.zsoft.zscore.core.service.organization.OrganizationService;
 import be.zsoft.zscore.core.service.user.UserInviteService;
 import be.zsoft.zscore.core.service.user.UserService;
@@ -42,12 +47,12 @@ class RegistrationControllerTest {
 
     @Test
     void register_withOrganization() {
-        OrganizationRequest organizationRequest = new OrganizationRequest("org");
-        UserRequest userRequest = new UserRequest("wout@z-soft.be", "wout", "pass");
+        OrganizationRequest organizationRequest = OrganizationRequestFixture.aDefaultOrganizationRequest();
+        UserRequest userRequest = UserRequestFixture.aDefaultUserRequest();
         RegistrationRequest request = new RegistrationRequest(organizationRequest, userRequest, null);
 
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
-        OrganizationResponse expected = new OrganizationResponse(UUID.randomUUID(), "org");
+        Organization organization = OrganizationFixture.aDefaultOrganization();
+        OrganizationResponse expected = OrganizationResponseFixture.aDefaultOrganizationResponse();
 
         when(organizationService.createOrganization(organizationRequest)).thenReturn(organization);
         when(organizationMapper.toResponse(organization)).thenReturn(expected);
@@ -66,12 +71,12 @@ class RegistrationControllerTest {
     void register_withInvite() {
         UUID inviteCode = UUID.randomUUID();
 
-        UserRequest userRequest = new UserRequest("wout@z-soft.be", "wout", "pass");
+        UserRequest userRequest = UserRequestFixture.aDefaultUserRequest();
         RegistrationRequest request = new RegistrationRequest(null, userRequest, inviteCode);
 
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
-        UserInvite invite = UserInvite.builder().id(UUID.randomUUID()).organization(organization).build();
-        OrganizationResponse expected = new OrganizationResponse(UUID.randomUUID(), "org");
+        UserInvite invite = UserInviteFixture.aDefaultInvite();
+        Organization organization = invite.getOrganization();
+        OrganizationResponse expected = OrganizationResponseFixture.aDefaultOrganizationResponse();
 
         when(userInviteService.getInvite(inviteCode)).thenReturn(invite);
         when(organizationMapper.toResponse(organization)).thenReturn(expected);

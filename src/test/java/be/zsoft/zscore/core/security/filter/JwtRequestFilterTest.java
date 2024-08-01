@@ -1,8 +1,7 @@
 package be.zsoft.zscore.core.security.filter;
 
-import be.zsoft.zscore.core.entity.game.Game;
-import be.zsoft.zscore.core.entity.player.Player;
-import be.zsoft.zscore.core.entity.user.User;
+import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
+import be.zsoft.zscore.core.fixtures.user.UserFixture;
 import be.zsoft.zscore.core.security.exception.TokenExpiredException;
 import be.zsoft.zscore.core.security.exception.TokenInvalidException;
 import be.zsoft.zscore.core.security.service.JwtService;
@@ -21,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -127,7 +125,7 @@ class JwtRequestFilterTest {
         when(jwtService.getClaims("access_token")).thenReturn(claims);
         when(claims.getSubject()).thenReturn("1e7240eb-5fe1-4a13-a12f-fc6b9a511c97");
         when(jwtService.getTokenType(claims)).thenReturn(JwtService.TokenType.ACCESS);
-        when(userService.getById(any(UUID.class))).thenReturn(User.builder().roles(List.of()).build());
+        when(userService.getById(any(UUID.class))).thenReturn(UserFixture.aDefaultUser());
 
         jwtRequestFilter.doFilterInternal(request, response, chain);
 
@@ -146,7 +144,7 @@ class JwtRequestFilterTest {
         when(jwtService.getClaims("access_token")).thenReturn(claims);
         when(claims.getSubject()).thenReturn("1e7240eb-5fe1-4a13-a12f-fc6b9a511c97");
         when(jwtService.getTokenType(claims)).thenReturn(JwtService.TokenType.PLAYER_ACCESS);
-        when(playerService.getPlayerById(any(UUID.class))).thenReturn(Player.builder().game(Game.builder().id(UUID.randomUUID()).build()).build());
+        when(playerService.getPlayerById(any(UUID.class))).thenReturn(PlayerFixture.aDefaultPlayer());
 
         jwtRequestFilter.doFilterInternal(request, response, chain);
 

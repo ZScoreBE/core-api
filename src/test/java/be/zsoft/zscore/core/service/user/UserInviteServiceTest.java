@@ -6,6 +6,9 @@ import be.zsoft.zscore.core.dto.request.user.UserInviteRequest;
 import be.zsoft.zscore.core.entity.organization.Organization;
 import be.zsoft.zscore.core.entity.user.UserInvite;
 import be.zsoft.zscore.core.entity.user.UserInviteStatus;
+import be.zsoft.zscore.core.fixtures.organization.OrganizationFixture;
+import be.zsoft.zscore.core.fixtures.user.UserInviteFixture;
+import be.zsoft.zscore.core.fixtures.user.UserInviteRequestFixture;
 import be.zsoft.zscore.core.repository.user.UserInviteRepo;
 import be.zsoft.zscore.core.service.organization.OrganizationService;
 import be.zsoft.zscore.core.service.utils.SMTPEmailService;
@@ -56,9 +59,9 @@ class UserInviteServiceTest {
 
     @Test
     void createInvite() {
-        UserInviteRequest request = new UserInviteRequest("wout@z-soft.be", "wout");
-        UserInvite expected = UserInvite.builder().id(UUID.randomUUID()).build();
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        UserInviteRequest request = UserInviteRequestFixture.aDefaultUserInviteRequest();
+        UserInvite expected = UserInviteFixture.aDefaultInvite();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
 
         when(userInviteMapper.fromRequest(request)).thenReturn(expected);
         when(userInviteRepo.saveAndFlush(expected)).thenReturn(expected);
@@ -82,10 +85,10 @@ class UserInviteServiceTest {
     @Test
     void getPendingInvites() {
         Pageable pageable = PageRequest.of(1, 10);
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
         Page<UserInvite> expected = new PageImpl<>(List.of(
-                UserInvite.builder().id(UUID.randomUUID()).build(),
-                UserInvite.builder().id(UUID.randomUUID()).build()
+                UserInviteFixture.aDefaultInvite(),
+                UserInviteFixture.aDefaultInvite()
         ));
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
@@ -103,12 +106,11 @@ class UserInviteServiceTest {
     @Test
     void getPendingInvites_search() {
         Pageable pageable = PageRequest.of(1, 10);
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
         Page<UserInvite> expected = new PageImpl<>(List.of(
-                UserInvite.builder().id(UUID.randomUUID()).build(),
-                UserInvite.builder().id(UUID.randomUUID()).build()
+                UserInviteFixture.aDefaultInvite(),
+                UserInviteFixture.aDefaultInvite()
         ));
-
         when(organizationService.getMyOrganization()).thenReturn(organization);
         when(userInviteRepo.searchAllOnNameAndEmailByStatusAndOrganization("%test%", UserInviteStatus.PENDING, organization, pageable)).thenReturn(expected);
 
@@ -122,7 +124,7 @@ class UserInviteServiceTest {
     @Test
     void getInvite_success() {
         UUID inviteCode = UUID.randomUUID();
-        UserInvite expected = UserInvite.builder().id(UUID.randomUUID()).build();
+        UserInvite expected = UserInviteFixture.aDefaultInvite();
 
         when(userInviteRepo.findByInviteCode(inviteCode)).thenReturn(Optional.of(expected));
 
@@ -147,8 +149,8 @@ class UserInviteServiceTest {
     @Test
     void getInviteWithOrganization_success() {
         UUID inviteCode = UUID.randomUUID();
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
-        UserInvite expected = UserInvite.builder().id(UUID.randomUUID()).build();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
+        UserInvite expected = UserInviteFixture.aDefaultInvite();
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
         when(userInviteRepo.findByInviteCodeAndOrganization(inviteCode, organization)).thenReturn(Optional.of(expected));
@@ -164,7 +166,7 @@ class UserInviteServiceTest {
     @Test
     void getInviteWithOrganization_notFound() {
         UUID inviteCode = UUID.randomUUID();
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
         when(userInviteRepo.findByInviteCodeAndOrganization(inviteCode, organization)).thenReturn(Optional.empty());
@@ -177,7 +179,7 @@ class UserInviteServiceTest {
 
     @Test
     void acceptInvite() {
-        UserInvite invite = UserInvite.builder().id(UUID.randomUUID()).build();
+        UserInvite invite = UserInviteFixture.aDefaultInvite();
 
         userInviteService.acceptInvite(invite);
 

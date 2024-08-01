@@ -5,8 +5,11 @@ import be.zsoft.zscore.core.dto.request.leaderboard.LeaderboardScoreRequest;
 import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.entity.leaderboard.Leaderboard;
 import be.zsoft.zscore.core.entity.leaderboard.LeaderboardScore;
-import be.zsoft.zscore.core.entity.leaderboard.LeaderboardScoreType;
 import be.zsoft.zscore.core.entity.player.Player;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
+import be.zsoft.zscore.core.fixtures.leaderboard.LeaderboardFixture;
+import be.zsoft.zscore.core.fixtures.leaderboard.LeaderboardScoreFixture;
+import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
 import be.zsoft.zscore.core.repository.leaderboard.LeaderboardScoreRepo;
 import be.zsoft.zscore.core.service.player.PlayerService;
 import org.junit.jupiter.api.Test;
@@ -43,10 +46,10 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void createLeaderboardScore_external_highest_noPreviousScore() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.HIGHEST).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Leaderboard leaderboard = LeaderboardFixture.aHighestScoreTypeLeaderboard();
         ExternalLeaderboardScoreRequest request = new ExternalLeaderboardScoreRequest(100);
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.aDefaultLeaderboardScore();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(leaderboardScoreRepo.findByLeaderboardAndPlayer(leaderboard, player)).thenReturn(Optional.empty());
@@ -68,10 +71,10 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void createLeaderboardScore_external_highest_scoreLowerThenOldOne() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.HIGHEST).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Leaderboard leaderboard = LeaderboardFixture.aHighestScoreTypeLeaderboard();
         ExternalLeaderboardScoreRequest request = new ExternalLeaderboardScoreRequest(100);
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).score(300).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.withScoreLeaderboard(300);
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(leaderboardScoreRepo.findByLeaderboardAndPlayer(leaderboard, player)).thenReturn(Optional.of(expected));
@@ -87,11 +90,11 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void createLeaderboardScore_external_highest_scoreHigherThenOldOne() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.HIGHEST).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Leaderboard leaderboard = LeaderboardFixture.aHighestScoreTypeLeaderboard();
         ExternalLeaderboardScoreRequest request = new ExternalLeaderboardScoreRequest(200);
         LeaderboardScore existing = LeaderboardScore.builder().id(UUID.randomUUID()).score(100).player(player).leaderboard(leaderboard).build();
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.aDefaultLeaderboardScore();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(leaderboardScoreRepo.findByLeaderboardAndPlayer(leaderboard, player)).thenReturn(Optional.of(existing));
@@ -113,12 +116,12 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void createLeaderboardScore_internal_highest_noPreviousScore() {
-        UUID playerId = UUID.randomUUID();
-        Player player = Player.builder().id(playerId).build();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.HIGHEST).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        UUID playerId = player.getId();
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard leaderboard = LeaderboardFixture.aHighestScoreTypeLeaderboard();
         LeaderboardScoreRequest request = new LeaderboardScoreRequest(100, playerId);
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.aDefaultLeaderboardScore();
 
         when(playerService.getPlayerByIdAndGame(playerId, game)).thenReturn(player);
         when(leaderboardScoreRepo.findByLeaderboardAndPlayer(leaderboard, player)).thenReturn(Optional.empty());
@@ -140,12 +143,12 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void createLeaderboardScore_internal_highest_scoreLowerThenOldOne() {
-        UUID playerId = UUID.randomUUID();
-        Player player = Player.builder().id(playerId).build();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.HIGHEST).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        UUID playerId = player.getId();
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard leaderboard = LeaderboardFixture.aHighestScoreTypeLeaderboard();
         LeaderboardScoreRequest request = new LeaderboardScoreRequest(100, playerId);
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).score(300).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.withScoreLeaderboard(300);
 
         when(playerService.getPlayerByIdAndGame(playerId, game)).thenReturn(player);
         when(leaderboardScoreRepo.findByLeaderboardAndPlayer(leaderboard, player)).thenReturn(Optional.of(expected));
@@ -162,12 +165,12 @@ class LeaderboardScoreServiceTest {
     @Test
     void createLeaderboardScore_internal_highest_scoreHigherThenOldOne() {
         UUID playerId = UUID.randomUUID();
-        Player player = Player.builder().id(playerId).build();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.HIGHEST).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard leaderboard = LeaderboardFixture.aHighestScoreTypeLeaderboard();
         LeaderboardScoreRequest request = new LeaderboardScoreRequest(200, playerId);
         LeaderboardScore existing = LeaderboardScore.builder().id(UUID.randomUUID()).score(100).player(player).leaderboard(leaderboard).build();
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.aDefaultLeaderboardScore();
 
         when(playerService.getPlayerByIdAndGame(playerId, game)).thenReturn(player);
         when(leaderboardScoreRepo.findByLeaderboardAndPlayer(leaderboard, player)).thenReturn(Optional.of(existing));
@@ -189,10 +192,10 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void createLeaderboardScore_external_latest_noPreviousScore() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.LATEST).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Leaderboard leaderboard = LeaderboardFixture.aLatestScoreTypeLeaderboard();
         ExternalLeaderboardScoreRequest request = new ExternalLeaderboardScoreRequest(100);
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.aDefaultLeaderboardScore();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(leaderboardScoreRepo.findByLeaderboardAndPlayer(leaderboard, player)).thenReturn(Optional.empty());
@@ -214,11 +217,11 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void createLeaderboardScore_external_latest_withPreviousScore() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.LATEST).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Leaderboard leaderboard = LeaderboardFixture.aLatestScoreTypeLeaderboard();
         ExternalLeaderboardScoreRequest request = new ExternalLeaderboardScoreRequest(50);
         LeaderboardScore existing = LeaderboardScore.builder().id(UUID.randomUUID()).score(100).player(player).leaderboard(leaderboard).build();
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.aDefaultLeaderboardScore();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(leaderboardScoreRepo.findByLeaderboardAndPlayer(leaderboard, player)).thenReturn(Optional.of(existing));
@@ -240,12 +243,12 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void createLeaderboardScore_internal_latest_noPreviousScore() {
-        UUID playerId = UUID.randomUUID();
-        Player player = Player.builder().id(playerId).build();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.LATEST).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        UUID playerId = player.getId();
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard leaderboard = LeaderboardFixture.aLatestScoreTypeLeaderboard();
         LeaderboardScoreRequest request = new LeaderboardScoreRequest(100, playerId);
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.aDefaultLeaderboardScore();
 
         when(playerService.getPlayerByIdAndGame(playerId, game)).thenReturn(player);
         when(leaderboardScoreRepo.findByLeaderboardAndPlayer(leaderboard, player)).thenReturn(Optional.empty());
@@ -267,13 +270,13 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void createLeaderboardScore_internal_latest_withPreviousScore() {
-        UUID playerId = UUID.randomUUID();
-        Player player = Player.builder().id(playerId).build();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.LATEST).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        UUID playerId = player.getId();
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard leaderboard = LeaderboardFixture.aLatestScoreTypeLeaderboard();
         LeaderboardScoreRequest request = new LeaderboardScoreRequest(50, playerId);
         LeaderboardScore existing = LeaderboardScore.builder().id(UUID.randomUUID()).score(100).player(player).leaderboard(leaderboard).build();
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.aDefaultLeaderboardScore();
 
         when(playerService.getPlayerByIdAndGame(playerId, game)).thenReturn(player);
         when(leaderboardScoreRepo.findByLeaderboardAndPlayer(leaderboard, player)).thenReturn(Optional.of(existing));
@@ -295,11 +298,11 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void createLeaderboardScore_external_multiple() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.MULTIPLE).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        Leaderboard leaderboard = LeaderboardFixture.aMultipleScoreTypeLeaderboard();
         ExternalLeaderboardScoreRequest request = new ExternalLeaderboardScoreRequest(100);
         LeaderboardScore toSave = LeaderboardScore.builder().score(100).player(player).leaderboard(leaderboard).build();
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.aDefaultLeaderboardScore();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
         when(leaderboardScoreRepo.saveAndFlush(toSave)).thenReturn(expected);
@@ -314,13 +317,13 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void createLeaderboardScore_internal_multiple() {
-        UUID playerId = UUID.randomUUID();
-        Player player = Player.builder().id(playerId).build();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).scoreType(LeaderboardScoreType.MULTIPLE).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        UUID playerId = player.getId();
+        Game game = GameFixture.aDefaultGame();
+        Leaderboard leaderboard = LeaderboardFixture.aMultipleScoreTypeLeaderboard();
         LeaderboardScoreRequest request = new LeaderboardScoreRequest(100, playerId);
         LeaderboardScore toSave = LeaderboardScore.builder().score(100).player(player).leaderboard(leaderboard).build();
-        LeaderboardScore expected = LeaderboardScore.builder().id(UUID.randomUUID()).build();
+        LeaderboardScore expected = LeaderboardScoreFixture.aDefaultLeaderboardScore();
 
         when(playerService.getPlayerByIdAndGame(playerId, game)).thenReturn(player);
         when(leaderboardScoreRepo.saveAndFlush(toSave)).thenReturn(expected);
@@ -335,11 +338,11 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void getScores() {
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).direction(Sort.Direction.DESC).build();
-        Pageable pageable = PageRequest.of(1, 10, Sort.Direction.DESC, "score");
+        Leaderboard leaderboard = LeaderboardFixture.aDefaultLeaderboard();
+        Pageable pageable = PageRequest.of(1, 10, Sort.Direction.ASC, "score");
         Page<LeaderboardScore> expected = new PageImpl<>(List.of(
-                LeaderboardScore.builder().id(UUID.randomUUID()).build(),
-                LeaderboardScore.builder().id(UUID.randomUUID()).build()
+                LeaderboardScoreFixture.aDefaultLeaderboardScore(),
+                LeaderboardScoreFixture.aDefaultLeaderboardScore()
         ));
 
         when(leaderboardScoreRepo.findAllScoresByLeaderboard(leaderboard, pageable)).thenReturn(expected);
@@ -353,7 +356,7 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void deleteAllScores() {
-        Leaderboard leaderboard = Leaderboard.builder().id(UUID.randomUUID()).build();
+        Leaderboard leaderboard = LeaderboardFixture.aDefaultLeaderboard();
 
         leaderboardScoreService.deleteAllScores(leaderboard);
 
@@ -362,7 +365,7 @@ class LeaderboardScoreServiceTest {
 
     @Test
     void deleteAllScoresByPlayer() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
+        Player player = PlayerFixture.aDefaultPlayer();
 
         leaderboardScoreService.deleteAllScoresByPlayer(player);
 

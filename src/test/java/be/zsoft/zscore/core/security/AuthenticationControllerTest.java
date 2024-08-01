@@ -1,5 +1,7 @@
 package be.zsoft.zscore.core.security;
 
+import be.zsoft.zscore.core.fixtures.token.TokenRequestFixture;
+import be.zsoft.zscore.core.fixtures.token.TokenResponseFixture;
 import be.zsoft.zscore.core.security.dto.request.RefreshTokenRequest;
 import be.zsoft.zscore.core.security.dto.request.TokenForPlayerRequest;
 import be.zsoft.zscore.core.security.dto.request.TokenRequest;
@@ -10,8 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -28,8 +28,8 @@ class AuthenticationControllerTest {
 
     @Test
     void getToken() {
-        TokenRequest request = new TokenRequest("user", "pass");
-        TokenResponse expected = new TokenResponse("access_token", "refresh_token");
+        TokenRequest request = TokenRequestFixture.aDefaultTokenRequest();
+        TokenResponse expected = TokenResponseFixture.aDefaultTokenResponse();
 
         when(securityService.getToken(request)).thenReturn(expected);
 
@@ -42,8 +42,8 @@ class AuthenticationControllerTest {
 
     @Test
     void getTokenForPlayer() {
-        TokenForPlayerRequest request = new TokenForPlayerRequest(UUID.randomUUID());
-        TokenResponse expected = new TokenResponse("access_token", "refresh_token");
+        TokenForPlayerRequest request = TokenRequestFixture.aDefaultTokenForPlayerRequest();
+        TokenResponse expected = TokenResponseFixture.aDefaultTokenResponse();
 
         when(securityService.getToken(request)).thenReturn(expected);
 
@@ -56,8 +56,8 @@ class AuthenticationControllerTest {
 
     @Test
     void getRefreshToken() {
-        RefreshTokenRequest request = new RefreshTokenRequest("refresh_token");
-        TokenResponse expected = new TokenResponse("access_token", "refresh_token");
+        RefreshTokenRequest request = TokenRequestFixture.aDefaultRefreshTokenRequest();
+        TokenResponse expected = TokenResponseFixture.aDefaultTokenResponse();
 
         when(securityService.refreshToken("refresh_token", false)).thenReturn(expected);
 
@@ -70,8 +70,8 @@ class AuthenticationControllerTest {
 
     @Test
     void getRefreshTokenForPlayer() {
-        RefreshTokenRequest request = new RefreshTokenRequest("refresh_token");
-        TokenResponse expected = new TokenResponse("access_token", "refresh_token");
+        RefreshTokenRequest request = TokenRequestFixture.aDefaultRefreshTokenRequest();
+        TokenResponse expected = TokenResponseFixture.aDefaultTokenResponse();
 
         when(securityService.refreshToken("refresh_token", true)).thenReturn(expected);
 

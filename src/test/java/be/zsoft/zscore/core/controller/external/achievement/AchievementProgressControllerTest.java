@@ -5,8 +5,11 @@ import be.zsoft.zscore.core.dto.mapper.achievement.AchievementProgressMapper;
 import be.zsoft.zscore.core.dto.response.achievement.AchievementProgressResponse;
 import be.zsoft.zscore.core.entity.achievement.Achievement;
 import be.zsoft.zscore.core.entity.achievement.AchievementProgress;
-import be.zsoft.zscore.core.entity.achievement.AchievementType;
 import be.zsoft.zscore.core.entity.game.Game;
+import be.zsoft.zscore.core.fixtures.achievement.AchievementFixture;
+import be.zsoft.zscore.core.fixtures.achievement.AchievementProgressFixture;
+import be.zsoft.zscore.core.fixtures.achievement.AchievementProgressResponseFixture;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
 import be.zsoft.zscore.core.service.achievement.AchievementProgressService;
 import be.zsoft.zscore.core.service.achievement.AchievementService;
 import be.zsoft.zscore.core.service.game.GameService;
@@ -49,12 +52,12 @@ class AchievementProgressControllerTest {
     void getAchievements() {
         Pageable pageable = PageRequest.of(1, 10);
         Page<AchievementProgress> progresses = new PageImpl<>(List.of(
-           AchievementProgress.builder().id(UUID.randomUUID()).build(),
-           AchievementProgress.builder().id(UUID.randomUUID()).build()
+                AchievementProgressFixture.aDefaultAchievementProgress(),
+                AchievementProgressFixture.aDefaultAchievementProgress()
         ));
         Page<AchievementProgressResponse> expected = new PageImpl<>(List.of(
-           new AchievementProgressResponse(UUID.randomUUID(), "Achievement 1", "Description 1", AchievementType.SINGLE, null, null, false),
-           new AchievementProgressResponse(UUID.randomUUID(), "Achievement 2", "Description 2", AchievementType.SINGLE, null, null, false)
+                AchievementProgressResponseFixture.aDefaultAchievementProgressResponse(),
+                AchievementProgressResponseFixture.aDefaultAchievementProgressResponse()
         ));
 
         when(achievementProgressService.getAchievementProgresses(pageable)).thenReturn(progresses);
@@ -68,12 +71,10 @@ class AchievementProgressControllerTest {
     @Test
     void completeAchievement() {
         UUID id = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).build();
-        AchievementProgress progress = AchievementProgress.builder().id(UUID.randomUUID()).build();
-        AchievementProgressResponse expected = new AchievementProgressResponse(
-                UUID.randomUUID(), "Achievement", "Description", AchievementType.SINGLE, null, null, false
-        );
+        Game game = GameFixture.aDefaultGame();
+        Achievement achievement = AchievementFixture.aDefaultAchievement();
+        AchievementProgress progress = AchievementProgressFixture.aDefaultAchievementProgress();
+        AchievementProgressResponse expected = AchievementProgressResponseFixture.aDefaultAchievementProgressResponse();
 
         when(gameService.getAuthenicatedGame()).thenReturn(game);
         when(achievementService.getAchievementById(game, id)).thenReturn(achievement);
@@ -92,12 +93,10 @@ class AchievementProgressControllerTest {
     @Test
     void increaseAchievementCount() {
         UUID id = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).build();
-        AchievementProgress progress = AchievementProgress.builder().id(UUID.randomUUID()).build();
-        AchievementProgressResponse expected = new AchievementProgressResponse(
-                UUID.randomUUID(), "Achievement", "Description", AchievementType.SINGLE, null, null, false
-        );
+        Game game = GameFixture.aDefaultGame();
+        Achievement achievement = AchievementFixture.aDefaultAchievement();
+        AchievementProgress progress = AchievementProgressFixture.aDefaultAchievementProgress();
+        AchievementProgressResponse expected = AchievementProgressResponseFixture.aDefaultAchievementProgressResponse();
 
         when(gameService.getAuthenicatedGame()).thenReturn(game);
         when(achievementService.getAchievementById(game, id)).thenReturn(achievement);
@@ -116,12 +115,10 @@ class AchievementProgressControllerTest {
     @Test
     void decreaseAchievementCount() {
         UUID id = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).build();
-        AchievementProgress progress = AchievementProgress.builder().id(UUID.randomUUID()).build();
-        AchievementProgressResponse expected = new AchievementProgressResponse(
-                UUID.randomUUID(), "Achievement", "Description", AchievementType.SINGLE, null, null, false
-        );
+        Game game = GameFixture.aDefaultGame();
+        Achievement achievement = AchievementFixture.aDefaultAchievement();
+        AchievementProgress progress = AchievementProgressFixture.aDefaultAchievementProgress();
+        AchievementProgressResponse expected = AchievementProgressResponseFixture.aDefaultAchievementProgressResponse();
 
         when(gameService.getAuthenicatedGame()).thenReturn(game);
         when(achievementService.getAchievementById(game, id)).thenReturn(achievement);

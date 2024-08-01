@@ -4,14 +4,15 @@ import be.zsoft.zscore.core.dto.mapper.organization.OrganizationMapper;
 import be.zsoft.zscore.core.dto.request.organization.OrganizationRequest;
 import be.zsoft.zscore.core.dto.response.organization.OrganizationResponse;
 import be.zsoft.zscore.core.entity.organization.Organization;
+import be.zsoft.zscore.core.fixtures.organization.OrganizationFixture;
+import be.zsoft.zscore.core.fixtures.organization.OrganizationRequestFixture;
+import be.zsoft.zscore.core.fixtures.organization.OrganizationResponseFixture;
 import be.zsoft.zscore.core.service.organization.OrganizationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -31,9 +32,8 @@ class OrganizationControllerTest {
 
     @Test
     void getMyOrganization() {
-        UUID id = UUID.randomUUID();
-        Organization organization = Organization.builder().id(id).build();
-        OrganizationResponse expected = new OrganizationResponse(id, "name");
+        Organization organization = OrganizationFixture.aDefaultOrganization();
+        OrganizationResponse expected = OrganizationResponseFixture.aDefaultOrganizationResponse();
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
         when(organizationMapper.toResponse(organization)).thenReturn(expected);
@@ -48,10 +48,9 @@ class OrganizationControllerTest {
 
     @Test
     void updateOrganization() {
-        OrganizationRequest request = new OrganizationRequest("newOrg");
-        UUID id = UUID.randomUUID();
-        Organization organization = Organization.builder().id(id).build();
-        OrganizationResponse expected = new OrganizationResponse(id, "name");
+        OrganizationRequest request = OrganizationRequestFixture.aDefaultOrganizationRequest();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
+        OrganizationResponse expected = OrganizationResponseFixture.aDefaultOrganizationResponse();
 
         when(organizationService.updateMyOrganization(request)).thenReturn(organization);
         when(organizationMapper.toResponse(organization)).thenReturn(expected);

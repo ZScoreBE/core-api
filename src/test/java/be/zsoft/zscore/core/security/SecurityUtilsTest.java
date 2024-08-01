@@ -5,6 +5,9 @@ import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.entity.organization.Organization;
 import be.zsoft.zscore.core.entity.player.Player;
 import be.zsoft.zscore.core.entity.user.User;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
+import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
+import be.zsoft.zscore.core.fixtures.user.UserFixture;
 import be.zsoft.zscore.core.security.dto.AuthenticationData;
 import be.zsoft.zscore.core.security.dto.ZScoreAuthenticationToken;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,9 +31,8 @@ class SecurityUtilsTest {
 
     @Test
     void checkIfOwnedByUser_shouldThrowApiExceptionIfNotOwned() {
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
-        User user = User.builder().id(UUID.randomUUID()).organization(organization).build();
-        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(user, null, null, organization), "token", null);
+        User user = UserFixture.aDefaultUser();
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(user, null, null, user.getOrganization()), "token", null);
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -44,9 +46,8 @@ class SecurityUtilsTest {
 
     @Test
     void checkIfOwnedByOrganization_shouldThrowApiExceptionIfNotOwned() {
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
-        User user = User.builder().id(UUID.randomUUID()).organization(organization).build();
-        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(user, null, null, organization), "token", null);
+        User user = UserFixture.aDefaultUser();
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(user, null, null, user.getOrganization()), "token", null);
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -60,7 +61,7 @@ class SecurityUtilsTest {
 
     @Test
     void getAuthenticatedUser_shouldReturnUser() {
-        User user = User.builder().id(UUID.randomUUID()).build();
+        User user = UserFixture.aDefaultUser();
         Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(user, null, null, null), "token", null);
 
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -78,7 +79,7 @@ class SecurityUtilsTest {
 
     @Test
     void isAuthenticated_shouldReturnTrueIfAuthenticated() {
-        User user = User.builder().id(UUID.randomUUID()).build();
+        User user = UserFixture.aDefaultUser();
         Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(user, null, null, null), "token", null);
 
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -93,13 +94,12 @@ class SecurityUtilsTest {
 
     @Test
     void getAuthenticatedOrganization_shouldReturnOrganization() {
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
-        User user = User.builder().id(UUID.randomUUID()).organization(organization).build();
-        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(user, null, null, organization), "token", null);
+        User user = UserFixture.aDefaultUser();
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(user, null, null, user.getOrganization()), "token", null);
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        assertEquals(organization, SecurityUtils.getAuthenticatedOrganization().get());
+        assertEquals(user.getOrganization(), SecurityUtils.getAuthenticatedOrganization().get());
     }
 
     @Test
@@ -112,7 +112,7 @@ class SecurityUtilsTest {
 
     @Test
     void getAuthenticatedPlayer_shouldReturnPlayer() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
+        Player player = PlayerFixture.aDefaultPlayer();
         Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, player, null, null), "token", null);
 
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -130,7 +130,7 @@ class SecurityUtilsTest {
 
     @Test
     void getAuthenticatedGame_shouldReturnGame() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, null, game, null), "token", null);
 
         SecurityContextHolder.getContext().setAuthentication(auth);

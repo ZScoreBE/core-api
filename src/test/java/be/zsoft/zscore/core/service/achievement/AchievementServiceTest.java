@@ -5,8 +5,10 @@ import be.zsoft.zscore.core.dto.mapper.achievement.AchievementMapper;
 import be.zsoft.zscore.core.dto.request.achievement.AchievementRequest;
 import be.zsoft.zscore.core.dto.request.achievement.UpdateAchievementRequest;
 import be.zsoft.zscore.core.entity.achievement.Achievement;
-import be.zsoft.zscore.core.entity.achievement.AchievementType;
 import be.zsoft.zscore.core.entity.game.Game;
+import be.zsoft.zscore.core.fixtures.achievement.AchievementFixture;
+import be.zsoft.zscore.core.fixtures.achievement.AchievementRequestFixture;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
 import be.zsoft.zscore.core.repository.achievement.AchievementRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,10 +43,10 @@ class AchievementServiceTest {
 
     @Test
     void createAchievement() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        AchievementRequest request = new AchievementRequest("achievement", "description", AchievementType.MULTIPLE, 20);
-        Achievement achievementFromMapper = Achievement.builder().id(UUID.randomUUID()).build();
-        Achievement expected = Achievement.builder().id(UUID.randomUUID()).game(game).build();
+        Game game = GameFixture.aDefaultGame();
+        AchievementRequest request = AchievementRequestFixture.aDefaultAchievementRequest();
+        Achievement achievementFromMapper = AchievementFixture.aDefaultAchievement();
+        Achievement expected = AchievementFixture.aDefaultAchievement();
 
         when(achievementMapper.fromRequest(request)).thenReturn(achievementFromMapper);
         when(achievementRepo.saveAndFlush(achievementFromMapper)).thenReturn(expected);
@@ -59,11 +61,11 @@ class AchievementServiceTest {
 
     @Test
     void getAchievementsByGame() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         Pageable pageable = PageRequest.of(1, 10);
         Page<Achievement> expected = new PageImpl<>(List.of(
-                Achievement.builder().id(UUID.randomUUID()).build(),
-                Achievement.builder().id(UUID.randomUUID()).build()
+                AchievementFixture.aDefaultAchievement(),
+                AchievementFixture.aDefaultAchievement()
         ));
 
         when(achievementRepo.findAllByGame(game, pageable)).thenReturn(expected);
@@ -77,11 +79,11 @@ class AchievementServiceTest {
 
     @Test
     void searchAchievementsByGame() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         Pageable pageable = PageRequest.of(1, 10);
         Page<Achievement> expected = new PageImpl<>(List.of(
-                Achievement.builder().id(UUID.randomUUID()).build(),
-                Achievement.builder().id(UUID.randomUUID()).build()
+                AchievementFixture.aDefaultAchievement(),
+                AchievementFixture.aDefaultAchievement()
         ));
 
         when(achievementRepo.searchAllOnNameByGame("%test%", game, pageable)).thenReturn(expected);
@@ -96,8 +98,8 @@ class AchievementServiceTest {
     @Test
     void getAchievementById_success() {
         UUID achievementId = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Achievement expected = Achievement.builder().id(achievementId).game(game).build();
+        Game game = GameFixture.aDefaultGame();
+        Achievement expected = AchievementFixture.aDefaultAchievement();
 
         when(achievementRepo.findByIdAndGame(achievementId, game)).thenReturn(Optional.of(expected));
 
@@ -109,7 +111,7 @@ class AchievementServiceTest {
     @Test
     void getAchievementById_notFound() {
         UUID achievementId = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
 
         when(achievementRepo.findByIdAndGame(achievementId, game)).thenReturn(Optional.empty());
 
@@ -119,9 +121,9 @@ class AchievementServiceTest {
     @Test
     void updateAchievementById() {
         UUID achievementId = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Achievement expected = Achievement.builder().id(achievementId).game(game).build();
-        UpdateAchievementRequest request = new UpdateAchievementRequest("Achievement", "description", 20);
+        Game game = GameFixture.aDefaultGame();
+        Achievement expected = AchievementFixture.aDefaultAchievement();
+        UpdateAchievementRequest request = AchievementRequestFixture.aDefaultUpdateAchievementRequest();
 
         when(achievementRepo.findByIdAndGame(achievementId, game)).thenReturn(Optional.of(expected));
         when(achievementMapper.fromRequest(request, expected)).thenReturn(expected);
@@ -139,8 +141,8 @@ class AchievementServiceTest {
     @Test
     void deleteAchievementById() {
         UUID achievementId = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        Achievement achievement = Achievement.builder().id(achievementId).game(game).build();
+        Game game = GameFixture.aDefaultGame();
+        Achievement achievement = AchievementFixture.aDefaultAchievement();
 
         when(achievementRepo.findByIdAndGame(achievementId, game)).thenReturn(Optional.of(achievement));
 
@@ -151,10 +153,10 @@ class AchievementServiceTest {
 
     @Test
     void getAllAchievementsByGame() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         List<Achievement> expected = List.of(
-                Achievement.builder().id(UUID.randomUUID()).build(),
-                Achievement.builder().id(UUID.randomUUID()).build()
+                AchievementFixture.aDefaultAchievement(),
+                AchievementFixture.aDefaultAchievement()
         );
 
         when(achievementRepo.findAllByGame(game)).thenReturn(expected);
@@ -167,7 +169,7 @@ class AchievementServiceTest {
 
     @Test
     void countAchievementsByGame() {
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         long expected = 10;
 
         when(achievementRepo.countByGame(game)).thenReturn(expected);

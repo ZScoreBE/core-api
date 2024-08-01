@@ -1,8 +1,8 @@
 package be.zsoft.zscore.core.security.filter;
 
 import be.zsoft.zscore.core.entity.game.Game;
-import be.zsoft.zscore.core.entity.organization.Organization;
 import be.zsoft.zscore.core.entity.user.Role;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
 import be.zsoft.zscore.core.security.dto.AuthenticationData;
 import be.zsoft.zscore.core.security.dto.ZScoreAuthenticationToken;
 import be.zsoft.zscore.core.service.game.GameService;
@@ -20,7 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -96,11 +95,7 @@ class ApiKeyRequestFilterTest {
 
     @Test
     void doFilterInternal_process() throws Exception {
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
-        Game game = Game.builder()
-                .id(UUID.randomUUID())
-                .organization(organization)
-                .build();
+        Game game = GameFixture.aDefaultGame();
 
         when(request.getHeader("Authorization")).thenReturn("ApiKey the_key");
         when(request.getMethod()).thenReturn("GET");
@@ -112,7 +107,7 @@ class ApiKeyRequestFilterTest {
         verify(chain).doFilter(request, response);
 
         ZScoreAuthenticationToken expected = new ZScoreAuthenticationToken(
-                new AuthenticationData(null, null, game, organization),
+                new AuthenticationData(null, null, game, game.getOrganization()),
                 "the_key",
                 List.of(new SimpleGrantedAuthority(Role.ROLE_API.name()))
         );

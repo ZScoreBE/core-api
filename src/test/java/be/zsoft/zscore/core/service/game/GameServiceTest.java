@@ -4,8 +4,10 @@ import be.zsoft.zscore.core.common.exception.NotFoundException;
 import be.zsoft.zscore.core.dto.mapper.game.GameMapper;
 import be.zsoft.zscore.core.dto.request.game.GameRequest;
 import be.zsoft.zscore.core.entity.game.Game;
-import be.zsoft.zscore.core.entity.game.GameEngine;
 import be.zsoft.zscore.core.entity.organization.Organization;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
+import be.zsoft.zscore.core.fixtures.game.GameRequestFixture;
+import be.zsoft.zscore.core.fixtures.organization.OrganizationFixture;
 import be.zsoft.zscore.core.repository.game.GameRepo;
 import be.zsoft.zscore.core.security.dto.AuthenticationData;
 import be.zsoft.zscore.core.security.dto.ZScoreAuthenticationToken;
@@ -54,26 +56,13 @@ class GameServiceTest {
 
     @Test
     void createGames_success() {
-        GameRequest request = new GameRequest("game", GameEngine.UNITY);
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
-        Game sandboxGame = Game.builder().name("game").engine(GameEngine.UNITY).build();
-        Game liveGame = Game.builder().name("game").engine(GameEngine.UNITY).build();
+        GameRequest request = GameRequestFixture.aDefaultGameRequest();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
+        Game sandboxGame = GameFixture.aDefaultGame();
+        Game liveGame = GameFixture.aDefaultGame();
 
-        Game expextedSandboxGame = Game.builder()
-                .name("game")
-                .engine(GameEngine.UNITY)
-                .active(true)
-                .sandboxMode(true)
-                .organization(organization)
-                .build();
-
-        Game expextedLiveGame = Game.builder()
-                .name("game")
-                .engine(GameEngine.UNITY)
-                .active(true)
-                .sandboxMode(false)
-                .organization(organization)
-                .build();
+        Game expextedSandboxGame = GameFixture.aSandboxGame();
+        Game expextedLiveGame = GameFixture.aLiveGame();
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
         when(gameMapper.fromRequest(request)).thenReturn(sandboxGame, liveGame);
@@ -116,7 +105,7 @@ class GameServiceTest {
 
     @Test
     void hasGames() {
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
 
@@ -129,8 +118,8 @@ class GameServiceTest {
     @Test
     void getById_success() {
         UUID id = UUID.randomUUID();
-        Game expected = Game.builder().id(UUID.randomUUID()).build();
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        Game expected = GameFixture.aDefaultGame();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
         when(gameRepo.findByIdAndOrganization(id, organization)).thenReturn(Optional.of(expected));
@@ -145,7 +134,7 @@ class GameServiceTest {
     @Test
     void getById_notFound() {
         UUID id = UUID.randomUUID();
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
         when(gameRepo.findByIdAndOrganization(id, organization)).thenReturn(Optional.empty());
@@ -160,18 +149,20 @@ class GameServiceTest {
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
         UUID generationId = UUID.randomUUID();
-        Game game1 = Game.builder().id(id1).generationId(generationId).sandboxMode(false).build();
-        Game game2 = Game.builder().id(id2).generationId(generationId).sandboxMode(true).build();
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        Game game1 = GameFixture.aLiveGame();
+        game1.setGenerationId(generationId);
+        Game game2 = GameFixture.aSandboxGame();
+        game2.setGenerationId(generationId);
+        Organization organization = OrganizationFixture.aDefaultOrganization();
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
-        when(gameRepo.findByIdAndOrganization(id1, organization)).thenReturn(Optional.of(game1));
+        when(gameRepo.findByIdAndOrganization(game1.getId(), organization)).thenReturn(Optional.of(game1));
         when(gameRepo.findAllByGenerationId(generationId)).thenReturn(List.of(game1, game2));
         when(gameRepo.saveAllAndFlush(anyList())).thenReturn(List.of(game1, game2));
 
-        Game result = gameService.regenerateApiKey(id1);
+        Game result = gameService.regenerateApiKey(game1.getId());
 
-        verify(gameRepo).findByIdAndOrganization(id1, organization);
+        verify(gameRepo).findByIdAndOrganization(game1.getId(), organization);
         verify(gameRepo).findAllByGenerationId(generationId);
         verify(gameRepo).saveAllAndFlush(gamesCaptor.capture());
 
@@ -183,11 +174,12 @@ class GameServiceTest {
     @Test
     void regenerateApiKey_IllegalStateException() {
         UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
         UUID generationId = UUID.randomUUID();
-        Game game1 = Game.builder().id(id1).generationId(generationId).sandboxMode(false).build();
-        Game game2 = Game.builder().id(id2).generationId(generationId).sandboxMode(true).build();
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        Game game1 = GameFixture.aLiveGame();
+        game1.setGenerationId(generationId);
+        Game game2 = GameFixture.aSandboxGame();
+        game2.setGenerationId(generationId);
+        Organization organization = OrganizationFixture.aDefaultOrganization();
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
         when(gameRepo.findByIdAndOrganization(id1, organization)).thenReturn(Optional.of(game1));
@@ -209,21 +201,23 @@ class GameServiceTest {
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
         UUID generationId = UUID.randomUUID();
-        GameRequest request = new GameRequest("New name", GameEngine.UNITY);
-        Game game1 = Game.builder().id(id1).generationId(generationId).sandboxMode(false).build();
-        Game game2 = Game.builder().id(id2).generationId(generationId).sandboxMode(true).build();
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        GameRequest request = GameRequestFixture.aDefaultGameRequest();
+        Game game1 = GameFixture.aLiveGame();
+        game1.setGenerationId(generationId);
+        Game game2 = GameFixture.aSandboxGame();
+        game2.setGenerationId(generationId);
+        Organization organization = OrganizationFixture.aDefaultOrganization();
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
-        when(gameRepo.findByIdAndOrganization(id1, organization)).thenReturn(Optional.of(game1));
+        when(gameRepo.findByIdAndOrganization(game1.getId(), organization)).thenReturn(Optional.of(game1));
         when(gameRepo.findAllByGenerationId(generationId)).thenReturn(List.of(game1, game2));
         when(gameRepo.saveAllAndFlush(anyList())).thenReturn(List.of(game1, game2));
         when(gameMapper.fromRequest(request, game1)).thenReturn(game1);
         when(gameMapper.fromRequest(request, game2)).thenReturn(game2);
 
-        Game result = gameService.updateGameGeneralSettings(id1, request);
+        Game result = gameService.updateGameGeneralSettings(game1.getId(), request);
 
-        verify(gameRepo).findByIdAndOrganization(id1, organization);
+        verify(gameRepo).findByIdAndOrganization(game1.getId(), organization);
         verify(gameRepo).findAllByGenerationId(generationId);
         verify(gameMapper).fromRequest(request, game1);
         verify(gameMapper).fromRequest(request, game2);
@@ -235,12 +229,13 @@ class GameServiceTest {
     @Test
     void updateGameGeneralSettings_IllegalStateException() {
         UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
         UUID generationId = UUID.randomUUID();
-        GameRequest request = new GameRequest("New name", GameEngine.UNITY);
-        Game game1 = Game.builder().id(id1).generationId(generationId).sandboxMode(false).build();
-        Game game2 = Game.builder().id(id2).generationId(generationId).sandboxMode(true).build();
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        GameRequest request = GameRequestFixture.aDefaultGameRequest();
+        Game game1 = GameFixture.aLiveGame();
+        game1.setGenerationId(generationId);
+        Game game2 = GameFixture.aSandboxGame();
+        game2.setGenerationId(generationId);
+        Organization organization = OrganizationFixture.aDefaultOrganization();
 
         when(organizationService.getMyOrganization()).thenReturn(organization);
         when(gameRepo.findByIdAndOrganization(id1, organization)).thenReturn(Optional.of(game1));
@@ -260,7 +255,7 @@ class GameServiceTest {
 
     @Test
     void getAuthenticatedGame_success() {
-        Game expected = Game.builder().id(UUID.randomUUID()).build();
+        Game expected = GameFixture.aDefaultGame();
         Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, null,expected, null), "", null);
         SecurityContextHolder.getContext().setAuthentication(auth);
 

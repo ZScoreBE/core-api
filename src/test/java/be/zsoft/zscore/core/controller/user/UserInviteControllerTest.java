@@ -5,7 +5,9 @@ import be.zsoft.zscore.core.dto.mapper.user.UserInviteMapper;
 import be.zsoft.zscore.core.dto.request.user.UserInviteRequest;
 import be.zsoft.zscore.core.dto.response.user.UserInviteResponse;
 import be.zsoft.zscore.core.entity.user.UserInvite;
-import be.zsoft.zscore.core.entity.user.UserInviteStatus;
+import be.zsoft.zscore.core.fixtures.user.UserInviteFixture;
+import be.zsoft.zscore.core.fixtures.user.UserInviteRequestFixture;
+import be.zsoft.zscore.core.fixtures.user.UserInviteResponseFixture;
 import be.zsoft.zscore.core.service.user.UserInviteService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,9 +39,9 @@ class UserInviteControllerTest {
 
     @Test
     void createUserInvite() {
-        UserInviteRequest request = new UserInviteRequest("wout@z-soft.be", "wout");
-        UserInvite invite = UserInvite.builder().id(UUID.randomUUID()).build();
-        UserInviteResponse expected = new UserInviteResponse(UUID.randomUUID(), "wout@z-soft.be", "wout", UserInviteStatus.PENDING);
+        UserInviteRequest request = UserInviteRequestFixture.aDefaultUserInviteRequest();
+        UserInvite invite = UserInviteFixture.aDefaultInvite();
+        UserInviteResponse expected = UserInviteResponseFixture.aDefaultUserInviteResponse();
 
         when(userInviteService.createInvite(request)).thenReturn(invite);
         when(userInviteMapper.toResponse(invite)).thenReturn(expected);
@@ -55,12 +57,12 @@ class UserInviteControllerTest {
     @Test
     void getPendingInvites() {
         Page<UserInvite> invites = new PageImpl<>(List.of(
-                UserInvite.builder().id(UUID.randomUUID()).build(),
-                UserInvite.builder().id(UUID.randomUUID()).build()
+                UserInviteFixture.aDefaultInvite(),
+                UserInviteFixture.aDefaultInvite()
         ));
         Page<UserInviteResponse> expected = new PageImpl<>(List.of(
-                new UserInviteResponse(UUID.randomUUID(), "wout@-zoft.be", "wout", UserInviteStatus.PENDING),
-                new UserInviteResponse(UUID.randomUUID(), "wout@-zoft.be", "wout", UserInviteStatus.PENDING)
+                UserInviteResponseFixture.aDefaultUserInviteResponse(),
+                UserInviteResponseFixture.aDefaultUserInviteResponse()
         ));
         Pageable pageable = PageRequest.of(1, 10);
 
@@ -79,12 +81,12 @@ class UserInviteControllerTest {
     @Test
     void getPendingInvites_search() {
         Page<UserInvite> invites = new PageImpl<>(List.of(
-                UserInvite.builder().id(UUID.randomUUID()).build(),
-                UserInvite.builder().id(UUID.randomUUID()).build()
+                UserInviteFixture.aDefaultInvite(),
+                UserInviteFixture.aDefaultInvite()
         ));
         Page<UserInviteResponse> expected = new PageImpl<>(List.of(
-                new UserInviteResponse(UUID.randomUUID(), "wout@-zoft.be", "wout", UserInviteStatus.PENDING),
-                new UserInviteResponse(UUID.randomUUID(), "wout@-zoft.be", "wout", UserInviteStatus.PENDING)
+                UserInviteResponseFixture.aDefaultUserInviteResponse(),
+                UserInviteResponseFixture.aDefaultUserInviteResponse()
         ));
         Pageable pageable = PageRequest.of(1, 10);
 

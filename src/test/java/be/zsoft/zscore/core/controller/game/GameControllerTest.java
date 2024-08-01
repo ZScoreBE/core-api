@@ -5,7 +5,9 @@ import be.zsoft.zscore.core.dto.request.game.GameRequest;
 import be.zsoft.zscore.core.dto.response.common.BoolResultResponse;
 import be.zsoft.zscore.core.dto.response.game.GameResponse;
 import be.zsoft.zscore.core.entity.game.Game;
-import be.zsoft.zscore.core.entity.game.GameEngine;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
+import be.zsoft.zscore.core.fixtures.game.GameRequestFixture;
+import be.zsoft.zscore.core.fixtures.game.GameResponseFixture;
 import be.zsoft.zscore.core.service.game.GameService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,9 +36,9 @@ class GameControllerTest {
 
     @Test
     void createGame() {
-        GameRequest request = new GameRequest("game", GameEngine.UNITY);
-        Game game = Game.builder().id(UUID.randomUUID()).build();
-        GameResponse expected = new GameResponse(UUID.randomUUID(), "game", GameEngine.UNITY, true, true, "key", UUID.randomUUID());
+        GameRequest request = GameRequestFixture.aDefaultGameRequest();
+        Game game = GameFixture.aDefaultGame();
+        GameResponse expected = GameResponseFixture.aDefaultGameResponse();
 
         when(gameService.createGames(request)).thenReturn(game);
         when(gameMapper.toResponse(game)).thenReturn(expected);
@@ -52,10 +54,12 @@ class GameControllerTest {
     @Test
     void getAllGames() {
         List<Game> games = List.of(
-                Game.builder().id(UUID.randomUUID()).build()
+                GameFixture.aDefaultGame(),
+                GameFixture.aDefaultGame()
         );
         List<GameResponse> expected = List.of(
-                new GameResponse(UUID.randomUUID(), "game", GameEngine.UNITY, true, true, "key", UUID.randomUUID())
+                GameResponseFixture.aDefaultGameResponse(),
+                GameResponseFixture.aDefaultGameResponse()
         );
 
         when(gameService.getAllGames()).thenReturn(games);
@@ -84,8 +88,8 @@ class GameControllerTest {
     @Test
     void getGameById() {
         UUID id = UUID.randomUUID();
-        Game game = Game.builder().id(id).build();
-        GameResponse expected = new GameResponse(id, "game", GameEngine.UNITY, true, true, "key", UUID.randomUUID());
+        Game game = GameFixture.aDefaultGame();
+        GameResponse expected = GameResponseFixture.aDefaultGameResponse();
 
         when(gameService.getById(id)).thenReturn(game);
         when(gameMapper.toResponse(game)).thenReturn(expected);
@@ -101,8 +105,8 @@ class GameControllerTest {
     @Test
     void regenerateApiKey() {
         UUID id = UUID.randomUUID();
-        Game game = Game.builder().id(id).build();
-        GameResponse expected = new GameResponse(id, "game", GameEngine.UNITY, true, true, "key", UUID.randomUUID());
+        Game game = GameFixture.aDefaultGame();
+        GameResponse expected = GameResponseFixture.aDefaultGameResponse();
 
         when(gameService.regenerateApiKey(id)).thenReturn(game);
         when(gameMapper.toResponse(game)).thenReturn(expected);

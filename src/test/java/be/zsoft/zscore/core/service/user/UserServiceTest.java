@@ -10,6 +10,9 @@ import be.zsoft.zscore.core.dto.request.user.UserRequest;
 import be.zsoft.zscore.core.entity.organization.Organization;
 import be.zsoft.zscore.core.entity.user.Role;
 import be.zsoft.zscore.core.entity.user.User;
+import be.zsoft.zscore.core.fixtures.organization.OrganizationFixture;
+import be.zsoft.zscore.core.fixtures.user.UserFixture;
+import be.zsoft.zscore.core.fixtures.user.UserRequestFixture;
 import be.zsoft.zscore.core.repository.user.UserRepo;
 import be.zsoft.zscore.core.security.dto.AuthenticationData;
 import be.zsoft.zscore.core.security.dto.ZScoreAuthenticationToken;
@@ -72,7 +75,7 @@ class UserServiceTest {
 
     @Test
     void loadUserByUsername_shouldFindUser() {
-        User user = User.builder().build();
+        User user = UserFixture.aDefaultUser();
         when(userRepo.findByEmail("wout@z-soft.be")).thenReturn(Optional.of(user));
 
         User result = userService.loadUserByUsername("wout@z-soft.be");
@@ -90,7 +93,7 @@ class UserServiceTest {
     @Test
     void getById_shouldFindUser() {
         UUID id = UUID.randomUUID();
-        User user = User.builder().id(id).build();
+        User user = UserFixture.aDefaultUser();
 
         when(userRepo.findById(id)).thenReturn(Optional.of(user));
 
@@ -109,15 +112,14 @@ class UserServiceTest {
 
     @Test
     void createUser() {
-        UserRequest request = new UserRequest("wout@z-soft.be", "wout", "pass");
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        UserRequest request = UserRequestFixture.aDefaultUserRequest();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
         UUID id = UUID.randomUUID();
-        User user = User.builder().id(id).organization(organization).build();
-        User userWithoutOrg = User.builder().id(id).build();
-
+        User user = UserFixture.aDefaultUser();
+        User userWithoutOrg = UserFixture.aUserWithoutOrganization();
 
         when(userMapper.fromRequest(request)).thenReturn(userWithoutOrg);
-        when(userRepo.saveAndFlush(user)).thenReturn(user);
+        when(userRepo.saveAndFlush(any(User.class))).thenReturn(user);
 
         User result = userService.createUser(request, organization, true);
 
@@ -125,7 +127,7 @@ class UserServiceTest {
 
         verify(userValidator).validate(request);
         verify(userMapper).fromRequest(request);
-        verify(userRepo).saveAndFlush(user);
+        verify(userRepo).saveAndFlush(any(User.class));
         verify(userRoleService).addRole(user, Role.ROLE_USER);
         verify(userRoleService).addRole(user, Role.ROLE_ORGANIZATION_ADMIN);
         verify(emailService).sendActivationMail(user);
@@ -133,7 +135,7 @@ class UserServiceTest {
 
     @Test
     void activateUser_success() {
-        User user = User.builder().id(UUID.randomUUID()).build();
+        User user = UserFixture.aDefaultUser();
 
         when(userRepo.findByActivationCode("code")).thenReturn(Optional.of(user));
 
@@ -154,7 +156,7 @@ class UserServiceTest {
 
     @Test
     void forgotPassword_success() {
-        User user = User.builder().id(UUID.randomUUID()).passwordResetCode("resetCode").build();
+        User user = UserFixture.aDefaultUser();
 
         when(userRepo.findByEmail("wout@z-soft.be")).thenReturn(Optional.of(user));
         when(userRepo.saveAndFlush(any(User.class))).thenReturn(user);
@@ -165,7 +167,7 @@ class UserServiceTest {
         verify(emailService).sendPasswordResetMail(user);
 
         assertNotNull(userArgumentCaptor.getValue().getPasswordResetCode());
-        assertNotEquals("resetCode", userArgumentCaptor.getValue().getPasswordResetCode());
+        assertNotEquals("123", userArgumentCaptor.getValue().getPasswordResetCode());
     }
 
     @Test
@@ -180,7 +182,7 @@ class UserServiceTest {
 
     @Test
     void sendResetPasswordMail() {
-        User user = User.builder().id(UUID.randomUUID()).passwordResetCode("resetCode").build();
+        User user = UserFixture.aDefaultUser();
 
         Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(user, null, null, null), "token", null);
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -193,12 +195,12 @@ class UserServiceTest {
         verify(emailService).sendPasswordResetMail(user);
 
         assertNotNull(userArgumentCaptor.getValue().getPasswordResetCode());
-        assertNotEquals("resetCode", userArgumentCaptor.getValue().getPasswordResetCode());
+        assertNotEquals("123", userArgumentCaptor.getValue().getPasswordResetCode());
     }
 
     @Test
     void resetPassword_success() {
-        User user = User.builder().id(UUID.randomUUID()).build();
+        User user = UserFixture.aDefaultUser();
 
         when(userRepo.findByPasswordResetCode("code")).thenReturn(Optional.of(user));
         when(passwordEncoder.encode("pass")).thenReturn("encodedPass");
@@ -222,7 +224,7 @@ class UserServiceTest {
 
     @Test
     void sendActivationMail_success() {
-        User user = User.builder().id(UUID.randomUUID()).activationCode("activationCode").build();
+        User user = UserFixture.aDefaultUser();
 
         when(userRepo.findByEmail("wout@z-soft.be")).thenReturn(Optional.of(user));
         when(userRepo.saveAndFlush(any(User.class))).thenReturn(user);
@@ -233,7 +235,7 @@ class UserServiceTest {
         verify(emailService).sendActivationMail(user);
 
         assertNotNull(userArgumentCaptor.getValue().getActivationCode());
-        assertNotEquals("activationCode", userArgumentCaptor.getValue().getActivationCode());
+        assertNotEquals("abc", userArgumentCaptor.getValue().getActivationCode());
     }
 
     @Test
@@ -248,7 +250,7 @@ class UserServiceTest {
 
     @Test
     void getMyself_success() {
-        User expected = User.builder().id(UUID.randomUUID()).build();
+        User expected = UserFixture.aDefaultUser();
 
         Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(expected, null, null, null), "token", null);
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -268,8 +270,8 @@ class UserServiceTest {
 
     @Test
     void updateMyself() {
-        UpdateUserRequest request = new UpdateUserRequest("new name");
-        User expected = User.builder().id(UUID.randomUUID()).build();
+        UpdateUserRequest request = UserRequestFixture.aDefaultUpdateUserRequest();
+        User expected = UserFixture.aDefaultUser();
 
         Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(expected, null, null, null), "token", null);
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -288,10 +290,10 @@ class UserServiceTest {
 
     @Test
     void getAllUsers() {
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
         List<User> users = List.of(
-                User.builder().id(UUID.randomUUID()).build(),
-                User.builder().id(UUID.randomUUID()).build()
+                UserFixture.aDefaultUser(),
+                UserFixture.aDefaultUser()
         );
         Page<User> expected = new PageImpl<>(users);
         Pageable pageable = PageRequest.of(1, 10);
@@ -309,10 +311,10 @@ class UserServiceTest {
 
     @Test
     void searchAllUsers() {
-        Organization organization = Organization.builder().id(UUID.randomUUID()).build();
+        Organization organization = OrganizationFixture.aDefaultOrganization();
         List<User> users = List.of(
-                User.builder().id(UUID.randomUUID()).build(),
-                User.builder().id(UUID.randomUUID()).build()
+                UserFixture.aDefaultUser(),
+                UserFixture.aDefaultUser()
         );
         Page<User> expected = new PageImpl<>(users);
         Pageable pageable = PageRequest.of(1, 10);

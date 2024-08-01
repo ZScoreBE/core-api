@@ -5,6 +5,9 @@ import be.zsoft.zscore.core.dto.mapper.user.UserMapper;
 import be.zsoft.zscore.core.dto.request.user.UpdateUserRequest;
 import be.zsoft.zscore.core.dto.response.user.UserResponse;
 import be.zsoft.zscore.core.entity.user.User;
+import be.zsoft.zscore.core.fixtures.user.UserFixture;
+import be.zsoft.zscore.core.fixtures.user.UserRequestFixture;
+import be.zsoft.zscore.core.fixtures.user.UserResponseFixture;
 import be.zsoft.zscore.core.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -36,9 +38,8 @@ class UserControllerTest {
 
     @Test
     void getMyself() {
-        UUID id = UUID.randomUUID();
-        User user = User.builder().id(id).build();
-        UserResponse expected = new UserResponse(id, "name", "wout@z-soft.be", true, false);
+        User user = UserFixture.aDefaultUser();
+        UserResponse expected = UserResponseFixture.aDefaultUserResponse();
 
         when(userService.getMyself()).thenReturn(user);
         when(userMapper.toResponse(user)).thenReturn(expected);
@@ -53,10 +54,9 @@ class UserControllerTest {
 
     @Test
     void updateMyself() {
-        UpdateUserRequest request = new UpdateUserRequest("new name");
-        UUID id = UUID.randomUUID();
-        User user = User.builder().id(id).build();
-        UserResponse expected = new UserResponse(id, "new name", "wout@z-soft.be", true, false);
+        UpdateUserRequest request = UserRequestFixture.aDefaultUpdateUserRequest();
+        User user = UserFixture.aDefaultUser();
+        UserResponse expected = UserResponseFixture.aDefaultUserResponse();
 
         when(userService.updateMyself(request)).thenReturn(user);
         when(userMapper.toResponse(user)).thenReturn(expected);
@@ -72,12 +72,12 @@ class UserControllerTest {
     @Test
     void getUsers() {
         Page<User> users = new PageImpl<>(List.of(
-                User.builder().id(UUID.randomUUID()).build(),
-                User.builder().id(UUID.randomUUID()).build()
+                UserFixture.aDefaultUser(),
+                UserFixture.aDefaultUser()
         ));
         Page<UserResponse> expected = new PageImpl<>(List.of(
-                new UserResponse(UUID.randomUUID(), "wout", "wout@z-soft.be", true, false),
-                new UserResponse(UUID.randomUUID(), "wout", "wout@z-soft.be", true, false)
+                UserResponseFixture.aDefaultUserResponse(),
+                UserResponseFixture.aDefaultUserResponse()
         ));
         Pageable pageable = PageRequest.of(1, 10);
 
@@ -96,12 +96,12 @@ class UserControllerTest {
     @Test
     void getUsers_search() {
         Page<User> users = new PageImpl<>(List.of(
-                User.builder().id(UUID.randomUUID()).build(),
-                User.builder().id(UUID.randomUUID()).build()
+                UserFixture.aDefaultUser(),
+                UserFixture.aDefaultUser()
         ));
         Page<UserResponse> expected = new PageImpl<>(List.of(
-                new UserResponse(UUID.randomUUID(), "wout", "wout@z-soft.be", true, false),
-                new UserResponse(UUID.randomUUID(), "wout", "wout@z-soft.be", true, false)
+                UserResponseFixture.aDefaultUserResponse(),
+                UserResponseFixture.aDefaultUserResponse()
         ));
         Pageable pageable = PageRequest.of(1, 10);
 

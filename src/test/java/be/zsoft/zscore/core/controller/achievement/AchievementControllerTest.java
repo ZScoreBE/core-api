@@ -7,8 +7,11 @@ import be.zsoft.zscore.core.dto.request.achievement.UpdateAchievementRequest;
 import be.zsoft.zscore.core.dto.response.achievement.AchievementResponse;
 import be.zsoft.zscore.core.dto.response.common.CountResponse;
 import be.zsoft.zscore.core.entity.achievement.Achievement;
-import be.zsoft.zscore.core.entity.achievement.AchievementType;
 import be.zsoft.zscore.core.entity.game.Game;
+import be.zsoft.zscore.core.fixtures.achievement.AchievementFixture;
+import be.zsoft.zscore.core.fixtures.achievement.AchievementRequestFixture;
+import be.zsoft.zscore.core.fixtures.achievement.AchievementResponseFixture;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
 import be.zsoft.zscore.core.service.achievement.AchievementService;
 import be.zsoft.zscore.core.service.game.GameService;
 import org.junit.jupiter.api.Test;
@@ -46,10 +49,10 @@ class AchievementControllerTest {
     @Test
     void createAchievement() {
         UUID gameId = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
-        AchievementRequest request = new AchievementRequest("Achievement", "Description", AchievementType.MULTIPLE, 20);
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).build();
-        AchievementResponse expected = new AchievementResponse(UUID.randomUUID(), "Achievement", "Description", AchievementType.MULTIPLE, 20);
+        Game game = GameFixture.aDefaultGame();
+        AchievementRequest request = AchievementRequestFixture.aDefaultAchievementRequest();
+        Achievement achievement = AchievementFixture.aDefaultAchievement();
+        AchievementResponse expected = AchievementResponseFixture.aDefaultAchievementResponse();
 
         when(gameService.getById(gameId)).thenReturn(game);
         when(achievementService.createAchievement(game, request)).thenReturn(achievement);
@@ -66,15 +69,15 @@ class AchievementControllerTest {
     @Test
     void getAchievements_all() {
         UUID gameId = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
+        Game game = GameFixture.aDefaultGame();
         Pageable pageable = PageRequest.of(1, 10);
         Page<Achievement> achievements = new PageImpl<>(List.of(
-                Achievement.builder().id(UUID.randomUUID()).build(),
-                Achievement.builder().id(UUID.randomUUID()).build()
+                AchievementFixture.aDefaultAchievement(),
+                AchievementFixture.aDefaultAchievement()
         ));
         Page<AchievementResponse> expected = new PageImpl<>(List.of(
-                new AchievementResponse(UUID.randomUUID(), "Achievement", "Description", AchievementType.MULTIPLE, 20),
-                new AchievementResponse(UUID.randomUUID(), "Achievement", "Description", AchievementType.MULTIPLE, 20)
+                AchievementResponseFixture.aDefaultAchievementResponse(),
+                AchievementResponseFixture.aDefaultAchievementResponse()
         ));
 
         when(gameService.getById(gameId)).thenReturn(game);
@@ -93,15 +96,15 @@ class AchievementControllerTest {
     @Test
     void getAchievements_search() {
         UUID gameId = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
+        Game game = GameFixture.aDefaultGame();
         Pageable pageable = PageRequest.of(1, 10);
         Page<Achievement> achievements = new PageImpl<>(List.of(
-                Achievement.builder().id(UUID.randomUUID()).build(),
-                Achievement.builder().id(UUID.randomUUID()).build()
+                AchievementFixture.aDefaultAchievement(),
+                AchievementFixture.aDefaultAchievement()
         ));
         Page<AchievementResponse> expected = new PageImpl<>(List.of(
-                new AchievementResponse(UUID.randomUUID(), "Achievement", "Description", AchievementType.MULTIPLE, 20),
-                new AchievementResponse(UUID.randomUUID(), "Achievement", "Description", AchievementType.MULTIPLE, 20)
+                AchievementResponseFixture.aDefaultAchievementResponse(),
+                AchievementResponseFixture.aDefaultAchievementResponse()
         ));
 
         when(gameService.getById(gameId)).thenReturn(game);
@@ -121,9 +124,9 @@ class AchievementControllerTest {
     void getAchievement() {
         UUID gameId = UUID.randomUUID();
         UUID achievementId = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).build();
-        AchievementResponse expected = new AchievementResponse(UUID.randomUUID(), "Achievement", "Description", AchievementType.MULTIPLE, 20);
+        Game game = GameFixture.aDefaultGame();
+        Achievement achievement = AchievementFixture.aDefaultAchievement();
+        AchievementResponse expected = AchievementResponseFixture.aDefaultAchievementResponse();
 
         when(gameService.getById(gameId)).thenReturn(game);
         when(achievementService.getAchievementById(game, achievementId)).thenReturn(achievement);
@@ -141,10 +144,10 @@ class AchievementControllerTest {
     void updateAchievement() {
         UUID gameId = UUID.randomUUID();
         UUID achievementId = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
-        UpdateAchievementRequest request = new UpdateAchievementRequest("Achievement", "Description", 20);
-        Achievement achievement = Achievement.builder().id(UUID.randomUUID()).build();
-        AchievementResponse expected = new AchievementResponse(UUID.randomUUID(), "Achievement", "Description", AchievementType.MULTIPLE, 20);
+        Game game = GameFixture.aDefaultGame();
+        UpdateAchievementRequest request = AchievementRequestFixture.aDefaultUpdateAchievementRequest();
+        Achievement achievement = AchievementFixture.aDefaultAchievement();
+        AchievementResponse expected = AchievementResponseFixture.aDefaultAchievementResponse();
 
         when(gameService.getById(gameId)).thenReturn(game);
         when(achievementService.updateAchievementById(game, achievementId, request)).thenReturn(achievement);
@@ -162,7 +165,7 @@ class AchievementControllerTest {
     void deleteAchievement() {
         UUID gameId = UUID.randomUUID();
         UUID achievementId = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
+        Game game = GameFixture.aDefaultGame();
 
         when(gameService.getById(gameId)).thenReturn(game);
 
@@ -175,7 +178,7 @@ class AchievementControllerTest {
     @Test
     void countAchievements() {
         UUID gameId = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
+        Game game = GameFixture.aDefaultGame();
         CountResponse expected = new CountResponse(10L);
 
         when(gameService.getById(gameId)).thenReturn(game);

@@ -6,6 +6,9 @@ import be.zsoft.zscore.core.dto.response.common.CountResponse;
 import be.zsoft.zscore.core.dto.response.player.PlayerResponse;
 import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.entity.player.Player;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
+import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
+import be.zsoft.zscore.core.fixtures.player.PlayerResponseFixture;
 import be.zsoft.zscore.core.service.achievement.AchievementProgressService;
 import be.zsoft.zscore.core.service.game.GameService;
 import be.zsoft.zscore.core.service.leaderboard.LeaderboardScoreService;
@@ -20,7 +23,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,15 +53,15 @@ class PlayerControllerTest {
     @Test
     void getPlayers_get() {
         UUID gameId = UUID.randomUUID();
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         Pageable pageable = PageRequest.of(1, 10);
         Page<Player> players = new PageImpl<>(List.of(
-                Player.builder().id(UUID.randomUUID()).build(),
-                Player.builder().id(UUID.randomUUID()).build()
+                PlayerFixture.aDefaultPlayer(),
+                PlayerFixture.aDefaultPlayer()
         ));
         Page<PlayerResponse> expected = new PageImpl<>(List.of(
-                new PlayerResponse(UUID.randomUUID(), "Wout", LocalDateTime.now()),
-                new PlayerResponse(UUID.randomUUID(), "Wout", LocalDateTime.now())
+                PlayerResponseFixture.aDefaultPlayerResponse(),
+                PlayerResponseFixture.aDefaultPlayerResponse()
         ));
 
         when(gameService.getById(gameId)).thenReturn(game);
@@ -80,15 +82,15 @@ class PlayerControllerTest {
     void getPlayers_search() {
         UUID gameId = UUID.randomUUID();
         String search = "search";
-        Game game = Game.builder().id(UUID.randomUUID()).build();
+        Game game = GameFixture.aDefaultGame();
         Pageable pageable = PageRequest.of(1, 10);
         Page<Player> players = new PageImpl<>(List.of(
-                Player.builder().id(UUID.randomUUID()).build(),
-                Player.builder().id(UUID.randomUUID()).build()
+                PlayerFixture.aDefaultPlayer(),
+                PlayerFixture.aDefaultPlayer()
         ));
         Page<PlayerResponse> expected = new PageImpl<>(List.of(
-                new PlayerResponse(UUID.randomUUID(), "Wout", LocalDateTime.now()),
-                new PlayerResponse(UUID.randomUUID(), "Wout", LocalDateTime.now())
+                PlayerResponseFixture.aDefaultPlayerResponse(),
+                PlayerResponseFixture.aDefaultPlayerResponse()
         ));
 
         when(gameService.getById(gameId)).thenReturn(game);
@@ -108,7 +110,7 @@ class PlayerControllerTest {
     @Test
     void countPlayers() {
         UUID gameId = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
+        Game game = GameFixture.aDefaultGame();
         CountResponse expected = new CountResponse(10L);
 
         when(gameService.getById(gameId)).thenReturn(game);
@@ -125,8 +127,8 @@ class PlayerControllerTest {
     void deletePlayer() {
         UUID gameId = UUID.randomUUID();
         UUID id = UUID.randomUUID();
-        Game game = Game.builder().id(gameId).build();
-        Player player = Player.builder().id(id).build();
+        Game game = GameFixture.aDefaultGame();
+        Player player = PlayerFixture.aDefaultPlayer();
 
         when(gameService.getById(gameId)).thenReturn(game);
         when(playerService.getPlayerByIdAndGame(id, game)).thenReturn(player);

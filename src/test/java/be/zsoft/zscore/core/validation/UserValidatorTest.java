@@ -3,7 +3,7 @@ package be.zsoft.zscore.core.validation;
 import be.zsoft.zscore.core.ErrorCodes;
 import be.zsoft.zscore.core.common.exception.ApiException;
 import be.zsoft.zscore.core.dto.request.user.UserRequest;
-import be.zsoft.zscore.core.entity.user.User;
+import be.zsoft.zscore.core.fixtures.user.UserFixture;
 import be.zsoft.zscore.core.repository.user.UserRepo;
 import be.zsoft.zscore.core.validation.request.UserValidator;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ class UserValidatorTest {
 
     @Test
     void validate_notUnique() {
-        when(userRepo.findByEmail("wout@z-soft.be")).thenReturn(Optional.of(User.builder().build()));
+        when(userRepo.findByEmail("wout@z-soft.be")).thenReturn(Optional.of(UserFixture.aDefaultUser()));
 
         ApiException ex = assertThrows(
                 ApiException.class,

@@ -3,7 +3,8 @@ package be.zsoft.zscore.core.controller.user;
 import be.zsoft.zscore.core.dto.mapper.user.UserInviteMapper;
 import be.zsoft.zscore.core.dto.response.user.UserInviteResponse;
 import be.zsoft.zscore.core.entity.user.UserInvite;
-import be.zsoft.zscore.core.entity.user.UserInviteStatus;
+import be.zsoft.zscore.core.fixtures.user.UserInviteFixture;
+import be.zsoft.zscore.core.fixtures.user.UserInviteResponseFixture;
 import be.zsoft.zscore.core.service.user.UserInviteService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,8 +33,8 @@ class PublicUserInviteControllerTest {
     @Test
     void getByCode() {
         UUID code = UUID.randomUUID();
-        UserInvite invite = UserInvite.builder().id(UUID.randomUUID()).build();
-        UserInviteResponse expected = new UserInviteResponse(UUID.randomUUID(), "wout@z-soft.be", "wout", UserInviteStatus.PENDING);
+        UserInvite invite = UserInviteFixture.aDefaultInvite();
+        UserInviteResponse expected = UserInviteResponseFixture.aDefaultUserInviteResponse();
 
         when(userInviteService.getInvite(code)).thenReturn(invite);
         when(userInviteMapper.toResponse(invite)).thenReturn(expected);

@@ -1,5 +1,6 @@
 package be.zsoft.zscore.core.config.properties;
 
+import be.zsoft.zscore.core.fixtures.mail.MailPropertiesFixture;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.InvalidPropertyException;
 
@@ -9,7 +10,7 @@ class MailPropertiesTest {
 
     @Test
     void shouldNotThrowExceptionWhenOverrideClasspathTemplatesIsDisabled() {
-        MailProperties props = new MailProperties(false, null, null, null, null, null, null);
+        MailProperties props = MailPropertiesFixture.aMailPropertiesWithoutOverrideClassPathTemplate();
 
         assertFalse(props.isOverrideClasspathTemplates());
         assertNull(props.getAbsoluteEmailTemplatesPath());
@@ -17,14 +18,17 @@ class MailPropertiesTest {
 
     @Test
     void shouldNotThrowExceptionWhenOverrideClasspathTemplatesIsEnabledAndAbsoluteEmailTemplatesPathGiven() {
-        MailProperties props = new MailProperties(true, "/hello", null, null, null, null, null);
+        MailProperties props = MailPropertiesFixture.aMailPropertiesWithOverrideClassPathTemplate();
 
         assertTrue(props.isOverrideClasspathTemplates());
         assertEquals("/hello", props.getAbsoluteEmailTemplatesPath());
     }
     @Test
     void shouldThrowExceptionWhenOverrideClasspathTemplatesIsEnabledAndAbsoluteEmailTemplatesPathNotGiven() {
-        assertThrows(InvalidPropertyException.class, () -> new MailProperties(true, "", null, null, null, null, null));
+        assertThrows(
+                InvalidPropertyException.class,
+                MailPropertiesFixture::aMailPropertiesWithOverrideClassPathTemplateAndEmptyPath
+        );
 
     }
 

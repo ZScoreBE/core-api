@@ -4,6 +4,8 @@ import be.zsoft.zscore.core.common.exception.ApiException;
 import be.zsoft.zscore.core.entity.player.Player;
 import be.zsoft.zscore.core.entity.user.Role;
 import be.zsoft.zscore.core.entity.user.User;
+import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
+import be.zsoft.zscore.core.fixtures.user.UserFixture;
 import be.zsoft.zscore.core.security.dto.request.TokenForPlayerRequest;
 import be.zsoft.zscore.core.security.dto.request.TokenRequest;
 import be.zsoft.zscore.core.security.dto.response.TokenResponse;
@@ -65,8 +67,7 @@ class SecurityServiceTest {
     @Test
     void getToken_shouldReturnTokens() {
         Authentication mockedAuth = mock(Authentication.class);
-        UUID id = UUID.randomUUID();
-        User user = User.builder().id(id).activated(true).build();
+        User user = UserFixture.aDefaultUser();
 
         when(authenticationManager.authenticate(authTokenCaptor.capture())).thenReturn(mockedAuth);
         when(mockedAuth.getName()).thenReturn("wout@z-soft.be");
@@ -86,8 +87,7 @@ class SecurityServiceTest {
     @Test
     void getToken_shouldThrowExceptionIfNotActivated() {
         Authentication mockedAuth = mock(Authentication.class);
-        UUID id = UUID.randomUUID();
-        User user = User.builder().id(id).activated(false).build();
+        User user = UserFixture.aNotActivatedUser();
 
         when(authenticationManager.authenticate(authTokenCaptor.capture())).thenReturn(mockedAuth);
         when(mockedAuth.getName()).thenReturn("wout@z-soft.be");
@@ -101,8 +101,8 @@ class SecurityServiceTest {
 
     @Test
     void getToken_forPlayer() {
-        UUID id = UUID.randomUUID();
-        Player player = Player.builder().id(id).name("name").build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        UUID id = player.getId();
 
         when(playerService.getPlayerById(id)).thenReturn(player);
         when(jwtService.generateToken(id.toString(), List.of(new SimpleGrantedAuthority(Role.ROLE_PLAYER.name())), JwtService.TokenType.PLAYER_ACCESS)).thenReturn("access_token");
@@ -125,7 +125,7 @@ class SecurityServiceTest {
     @Test
     void refreshToken_shouldReturnTokens() {
         UUID id = UUID.randomUUID();
-        User user = User.builder().id(id).build();
+        User user = UserFixture.aDefaultUser();
 
         when(jwtService.isRefreshToken("refresh_token")).thenReturn(true);
         when(jwtService.getSubject("refresh_token")).thenReturn(id.toString());
@@ -141,8 +141,8 @@ class SecurityServiceTest {
 
     @Test
     void refreshToken_shouldReturnTokensForPlayer() {
-        UUID id = UUID.randomUUID();
-        Player player = Player.builder().id(id).build();
+        Player player = PlayerFixture.aDefaultPlayer();
+        UUID id = player.getId();
 
         when(jwtService.isRefreshToken("refresh_token")).thenReturn(true);
         when(jwtService.getSubject("refresh_token")).thenReturn(id.toString());
