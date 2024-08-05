@@ -4,6 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
 
+    <!-- V1.0.0 -->
     <include file="db/changelog/v1.0.0/01-organization.xml" relativeToChangelogFile="false" />
     <include file="db/changelog/v1.0.0/02-user.xml" relativeToChangelogFile="false" />
     <include file="db/changelog/v1.0.0/03-user_role.xml" relativeToChangelogFile="false" />
@@ -14,5 +15,9 @@
     <include file="db/changelog/v1.0.0/08-leaderboard_score.xml" relativeToChangelogFile="false" />
     <include file="db/changelog/v1.0.0/09-achievement.xml" relativeToChangelogFile="false" />
     <include file="db/changelog/v1.0.0/10-achievement_progress.xml" relativeToChangelogFile="false" />
+
+    <!-- V1.1.0 -->
+    <include file="db/changelog/v1.1.0/01-currency.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.1.0/02-currency_offer.xml" relativeToChangelogFile="false" />
 
 </databaseChangeLog>
