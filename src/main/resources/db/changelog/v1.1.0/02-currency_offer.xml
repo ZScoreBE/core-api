@@ -16,7 +16,7 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="key" type="VARCHAR(5)">
+            <column name="key_code" type="VARCHAR(5)">
                 <constraints nullable="false"/>
             </column>
 
@@ -56,7 +56,7 @@
         <loadData tableName="currency_offers" file="db/data/currency_offer.csv" separator=";">
             <column name="id" type="string"/>
             <column name="name" type="string"/>
-            <column name="key" type="string"/>
+            <column name="key_code" type="string"/>
             <column name="amount" type="integer"/>
             <column name="price_ex" type="decimal"/>
             <column name="discount_price_ex" type="decimal"/>

@@ -30,7 +30,7 @@ public class Currency extends BaseEntity {
     @Column(name = "name", length = 255, nullable = false)
     private String name;
 
-    @Column(name = "key", length = 5, nullable = false)
+    @Column(name = "key_code", length = 5, nullable = false)
     private String key;
 
     @ManyToOne

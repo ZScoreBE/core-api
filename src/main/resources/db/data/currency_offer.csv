@@ -1,4 +1,4 @@
-id;name;key;amount;price_ex;discount_price_ex;currency_id
+id;name;key_code;amount;price_ex;discount_price_ex;currency_id
 0794bd66-6e7d-4c8d-9982-6fa0b9a4a96a;10 Gold;G10;10;1.00;;b116a25b-f94c-4550-8bcc-e856c1f35824
 31048580-85ce-497c-8242-ca698668d1d4;100 Gold;G100;100;10.00;9.00;b116a25b-f94c-4550-8bcc-e856c1f35824
 1b5c20f1-292f-416e-8d7c-491fb72a401f;1000 Gold;G1000;1000;100.00;85.00;b116a25b-f94c-4550-8bcc-e856c1f35824
