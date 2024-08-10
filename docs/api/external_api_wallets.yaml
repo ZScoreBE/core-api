@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: External API
+  description: Rest API to use in your games
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /external/wallets:
+    post:
+      summary: Create a new wallet
+      operationId: createWallet
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletRequest'
+      responses:
+        201:
+          description: The created wallet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponse'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+    get:
+      summary: Get wallets
+      operationId: getWallets
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - $ref: './external_api_common_components.yaml#/components/parameters/pageQueryParam'
+        - $ref: './external_api_common_components.yaml#/components/parameters/sizeQueryParam'
+      responses:
+        200:
+          description: The wallets for a player
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponseList'
+
+  /external/wallets/{id}:
+    get:
+      summary: Get wallet details
+      operationId: getWalletById
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - in: path
+          name: id
+          required: true
+          description: The wallet ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: The wallet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponse'
+
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    WalletRequest:
+      type: object
+      required:
+        - initialAmount
+        - currencyId
+      properties:
+        initialAmount:
+          type: integer
+          nullable: false
+        currencyId:
+          type: string
+          format: uuid
+          nullable: false
+
+    WalletResponse:
+      readOnly: true
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        amount:
+          type: integer
+          nullable: false
+        currency:
+          $ref: '#/components/schemas/CurrencyResponse'
+
+    CurrencyResponse:
+      readOnly: true
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        key:
+          type: string
+          nullable: false
+
+    WalletResponseList:
+      readOnly: true
+      type: object
+      properties:
+        items:
+          type: array
+          nullable: false
+          items:
+            $ref: '#/components/schemas/WalletResponse'
+        currentPage:
+          type: integer
+          format: int32
+          nullable: false
+        count:
+          type: integer
+          format: int32
+          nullable: false
+        lastPage:
+          type: integer
+          format: int32
+          nullable: false
+        total:
+          type: integer
+          format: int64
+          nullable: false
+        links:
+          $ref: 'external_api_common_components.yaml#/components/schemas/PaginationLinks'

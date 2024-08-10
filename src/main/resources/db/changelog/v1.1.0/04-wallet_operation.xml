@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet id="04-01-wallet_operations-table" author="wout">
+        <createTable tableName="wallet_operations">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_achievement"/>
+            </column>
+
+            <column name="amount" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="wallet_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="timestamp" defaultValueComputed="NOW()">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="updated_at" type="timestamp" defaultValueComputed="NOW()">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="04-02-wallet_operations-relations" author="wout">
+        <addForeignKeyConstraint baseTableName="wallet_operations" baseColumnNames="wallet_id"
+                                 constraintName="fk_wallet_operations_wallet"
+                                 referencedTableName="wallets" referencedColumnNames="id" />
+    </changeSet>
+
+    <changeSet id="04-03-wallet_operations-data" author="wout" context="load-data">
+        <loadData tableName="wallet_operations" file="db/data/wallet_operation.csv" separator=";">
+            <column name="id" type="string"/>
+            <column name="amount" type="integer"/>
+            <column name="type" type="string"/>
+            <column name="wallet_id" type="string"/>
+        </loadData>
+    </changeSet>
+
+</databaseChangeLog>

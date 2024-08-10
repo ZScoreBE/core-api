@@ -6,30 +6,18 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd"
         objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
 
-    <changeSet id="02-01-currency_offers-table" author="wout">
-        <createTable tableName="currency_offers">
+    <changeSet id="03-01-wallet-table" author="wout">
+        <createTable tableName="wallets">
             <column name="id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_achievement"/>
-            </column>
-
-            <column name="name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="key_code" type="VARCHAR(5)">
-                <constraints nullable="false"/>
             </column>
 
             <column name="amount" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="price_ex" type="DECIMAL(16, 2)">
+            <column name="player_id" type="VARCHAR(255)">
                 <constraints nullable="false"/>
-            </column>
-
-            <column name="discount_price_ex" type="DECIMAL(16, 2)">
-                <constraints nullable="true"/>
             </column>
 
             <column name="currency_id" type="VARCHAR(255)">
@@ -46,20 +34,20 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="02-02-currency_offers-relations" author="wout">
-        <addForeignKeyConstraint baseTableName="currency_offers" baseColumnNames="currency_id"
-                                 constraintName="fk_currency_offer_currency"
+    <changeSet id="03-02-wallet-relations" author="wout">
+        <addForeignKeyConstraint baseTableName="wallets" baseColumnNames="player_id"
+                                 constraintName="fk_wallet_player"
+                                 referencedTableName="players" referencedColumnNames="id" />
+        <addForeignKeyConstraint baseTableName="wallets" baseColumnNames="currency_id"
+                                 constraintName="fk_wallet_currency"
                                  referencedTableName="currencies" referencedColumnNames="id" />
     </changeSet>
 
-    <changeSet id="02-03-currency_offers-data" author="wout" context="load-data">
-        <loadData tableName="currency_offers" file="db/data/currency_offer.csv" separator=";">
+    <changeSet id="03-03-wallet-data" author="wout" context="load-data">
+        <loadData tableName="wallets" file="db/data/wallet.csv" separator=";">
             <column name="id" type="string"/>
-            <column name="name" type="string"/>
-            <column name="key_code" type="string"/>
             <column name="amount" type="integer"/>
-            <column name="price_ex" type="decimal"/>
-            <column name="discount_price_ex" type="decimal"/>
+            <column name="player_id" type="string"/>
             <column name="currency_id" type="string"/>
         </loadData>
     </changeSet>

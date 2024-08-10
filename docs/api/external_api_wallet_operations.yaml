@@ -1,0 +1,110 @@
+openapi: 3.0.3
+info:
+  title: External API
+  description: Rest API to use in your games
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /external/wallets/{walletId}/operations:
+    post:
+      summary: Create a wallet operation
+      operationId: createWalletOperation
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - in: path
+          name: walletId
+          required: true
+          description: The wallet ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletOperationRequest'
+      responses:
+        201:
+          description: The created wallet operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletOperationResponse'
+
+    get:
+      summary: Get operations for a wallet
+      operationId: getOperations
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - $ref: './external_api_common_components.yaml#/components/parameters/pageQueryParam'
+        - $ref: './external_api_common_components.yaml#/components/parameters/sizeQueryParam'
+      responses:
+        200:
+          description: The operations for a wallet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletOperationResponseList'
+
+components:
+  schemas:
+    WalletOperationRequest:
+      type: object
+      required:
+        - type
+        - amount
+      properties:
+        type:
+          type: string
+          nullable: false
+          enum: [ INCREASE, DECREASE ]
+        amount:
+          type: integer
+          nullable: false
+
+    WalletOperationResponse:
+      readOnly: true
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        type:
+          type: string
+          nullable: false
+          enum: [ INCREASE, DECREASE ]
+        amount:
+          type: integer
+          nullable: false
+        wallet:
+          $ref: 'external_api_wallets.yaml#/components/schemas/WalletResponse'
+
+    WalletOperationResponseList:
+      readOnly: true
+      type: object
+      properties:
+        items:
+          type: array
+          nullable: false
+          items:
+            $ref: '#/components/schemas/WalletOperationResponse'
+        currentPage:
+          type: integer
+          format: int32
+          nullable: false
+        count:
+          type: integer
+          format: int32
+          nullable: false
+        lastPage:
+          type: integer
+          format: int32
+          nullable: false
+        total:
+          type: integer
+          format: int64
+          nullable: false
+        links:
+          $ref: 'external_api_common_components.yaml#/components/schemas/PaginationLinks'
