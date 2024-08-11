@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,6 +15,9 @@ public interface PlayerRepo extends JpaRepository<Player, UUID> {
 
     @Query("SELECT p FROM Player p WHERE p.game = :game ORDER BY p.name ASC")
     Page<Player> findAllByGame(Game game, Pageable pageable);
+
+    @Query("SELECT p FROM Player p WHERE p.game = :game ORDER BY p.name ASC")
+    List<Player> findAllByGame(Game game);
 
     @Query("SELECT p FROM Player p WHERE p.game = :game AND p.name LIKE :search ORDER BY p.name ASC")
     Page<Player> searchAllOnNameByGame(String search, Game game, Pageable pageable);

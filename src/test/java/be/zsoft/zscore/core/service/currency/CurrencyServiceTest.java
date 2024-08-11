@@ -9,6 +9,7 @@ import be.zsoft.zscore.core.fixtures.currency.CurrencyFixture;
 import be.zsoft.zscore.core.fixtures.currency.CurrencyRequestFixture;
 import be.zsoft.zscore.core.fixtures.game.GameFixture;
 import be.zsoft.zscore.core.repository.currency.CurrencyRepo;
+import be.zsoft.zscore.core.service.game.GameService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,6 +37,9 @@ class CurrencyServiceTest {
 
     @Mock
     private CurrencyRepo currencyRepo;
+
+    @Mock
+    private GameService gameService;
 
     @InjectMocks
     private CurrencyService currencyService;
@@ -151,5 +155,24 @@ class CurrencyServiceTest {
         currencyService.deleteCurrencyById(game, id);
 
         verify(currencyRepo).delete(expected);
+    }
+
+    @Test
+    void getAllCurrenciesByAuthenticatedGame() {
+        Game game = GameFixture.aDefaultGame();
+        List<Currency> expected = List.of(
+                CurrencyFixture.aDefaultCurrency(),
+                CurrencyFixture.aDefaultCurrency()
+        );
+
+        when(gameService.getAuthenicatedGame()).thenReturn(game);
+        when(currencyRepo.findAllByGame(game)).thenReturn(expected);
+
+        List<Currency> result = currencyService.getAllCurrenciesByAuthenticatedGame();
+
+        verify(gameService).getAuthenicatedGame();
+        verify(currencyRepo).findAllByGame(game);
+
+        assertEquals(expected, result);
     }
 }

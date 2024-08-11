@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -74,5 +75,9 @@ public class PlayerService {
 
     public void deletePlayer(Player player) {
         playerRepo.delete(player);
+    }
+
+    public List<Player> getAllPlayersByGame(Game game) {
+        return playerRepo.findAllByGame(game);
     }
 }

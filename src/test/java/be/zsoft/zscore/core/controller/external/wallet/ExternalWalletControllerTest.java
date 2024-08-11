@@ -2,13 +2,11 @@ package be.zsoft.zscore.core.controller.external.wallet;
 
 import be.zsoft.zscore.core.common.pagination.PaginatedResponse;
 import be.zsoft.zscore.core.dto.mapper.wallet.WalletMapper;
-import be.zsoft.zscore.core.dto.request.wallet.WalletRequest;
 import be.zsoft.zscore.core.dto.response.wallet.WalletResponse;
 import be.zsoft.zscore.core.entity.player.Player;
 import be.zsoft.zscore.core.entity.wallet.Wallet;
 import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
 import be.zsoft.zscore.core.fixtures.wallet.WalletFixture;
-import be.zsoft.zscore.core.fixtures.wallet.WalletRequestFixture;
 import be.zsoft.zscore.core.fixtures.wallet.WalletResponseFixture;
 import be.zsoft.zscore.core.service.player.PlayerService;
 import be.zsoft.zscore.core.service.wallet.WalletService;
@@ -43,26 +41,6 @@ class ExternalWalletControllerTest {
 
     @InjectMocks
     private ExternalWalletController externalWalletController;
-
-    @Test
-    void createWallet() {
-        WalletRequest request = WalletRequestFixture.aDefaultWalletRequest();
-        Player player = PlayerFixture.aDefaultPlayer();
-        Wallet wallet = WalletFixture.aDefaultWallet();
-        WalletResponse expected = WalletResponseFixture.aDefaultWalletResponse();
-
-        when(playerService.getAuthenticatedPlayer()).thenReturn(player);
-        when(walletService.createWallet(request, player)).thenReturn(wallet);
-        when(walletMapper.toResponse(wallet)).thenReturn(expected);
-
-        WalletResponse response = externalWalletController.createWallet(request);
-
-        verify(playerService).getAuthenticatedPlayer();
-        verify(walletService).createWallet(request, player);
-        verify(walletMapper).toResponse(wallet);
-
-        assertEquals(expected, response);
-    }
 
     @Test
     void getWallets() {

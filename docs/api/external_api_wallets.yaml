@@ -7,30 +7,6 @@ servers:
   - url: 'https'
 paths:
   /external/wallets:
-    post:
-      summary: Create a new wallet
-      operationId: createWallet
-      parameters:
-        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WalletRequest'
-      responses:
-        201:
-          description: The created wallet
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WalletResponse'
-        400:
-          description: Api Error
-          content:
-            application/json:
-              schema:
-                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
-
     get:
       summary: Get wallets
       operationId: getWallets
@@ -76,19 +52,6 @@ paths:
 
 components:
   schemas:
-    WalletRequest:
-      type: object
-      required:
-        - initialAmount
-        - currencyId
-      properties:
-        initialAmount:
-          type: integer
-          nullable: false
-        currencyId:
-          type: string
-          format: uuid
-          nullable: false
 
     WalletResponse:
       readOnly: true

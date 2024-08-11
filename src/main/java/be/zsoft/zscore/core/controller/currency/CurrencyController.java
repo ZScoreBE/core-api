@@ -6,8 +6,12 @@ import be.zsoft.zscore.core.dto.request.currency.CurrencyRequest;
 import be.zsoft.zscore.core.dto.response.currency.CurrencyResponse;
 import be.zsoft.zscore.core.entity.currency.Currency;
 import be.zsoft.zscore.core.entity.game.Game;
+import be.zsoft.zscore.core.entity.player.Player;
 import be.zsoft.zscore.core.service.currency.CurrencyService;
 import be.zsoft.zscore.core.service.game.GameService;
+import be.zsoft.zscore.core.service.player.PlayerService;
+import be.zsoft.zscore.core.service.wallet.WalletService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +20,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -26,14 +31,20 @@ public class CurrencyController {
     private final CurrencyService currencyService;
     private final CurrencyMapper currencyMapper;
     private final GameService gameService;
+    private final PlayerService playerService;
+    private final WalletService walletService;
 
     @PostMapping
     @Secured("ROLE_USER")
+    @Transactional
     public CurrencyResponse createCurrency(
             @PathVariable UUID gameId, @Valid @RequestBody CurrencyRequest currencyRequest
     ) {
         Game game = gameService.getById(gameId);
         Currency currency = currencyService.createCurrency(game, currencyRequest);
+
+        List<Player> players = playerService.getAllPlayersByGame(game);
+        walletService.createWallets(currency, players);
 
         return currencyMapper.toResponse(currency);
     }

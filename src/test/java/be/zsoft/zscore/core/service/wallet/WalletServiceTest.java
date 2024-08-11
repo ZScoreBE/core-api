@@ -1,22 +1,13 @@
 package be.zsoft.zscore.core.service.wallet;
 
-import be.zsoft.zscore.core.ErrorCodes;
-import be.zsoft.zscore.core.common.exception.ApiException;
 import be.zsoft.zscore.core.common.exception.NotFoundException;
-import be.zsoft.zscore.core.dto.mapper.wallet.WalletMapper;
-import be.zsoft.zscore.core.dto.request.wallet.WalletRequest;
 import be.zsoft.zscore.core.entity.currency.Currency;
-import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.entity.player.Player;
 import be.zsoft.zscore.core.entity.wallet.Wallet;
 import be.zsoft.zscore.core.fixtures.currency.CurrencyFixture;
-import be.zsoft.zscore.core.fixtures.game.GameFixture;
 import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
 import be.zsoft.zscore.core.fixtures.wallet.WalletFixture;
-import be.zsoft.zscore.core.fixtures.wallet.WalletRequestFixture;
 import be.zsoft.zscore.core.repository.wallet.WalletRepo;
-import be.zsoft.zscore.core.service.currency.CurrencyService;
-import be.zsoft.zscore.core.service.game.GameService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -35,8 +26,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WalletServiceTest {
@@ -44,68 +35,46 @@ class WalletServiceTest {
     @Mock
     private WalletRepo walletRepo;
 
-    @Mock
-    private WalletMapper walletMapper;
-
-    @Mock
-    private CurrencyService currencyService;
-
-    @Mock
-    private GameService gameService;
-
     @InjectMocks
     private WalletService walletService;
 
     @Captor
-    private ArgumentCaptor<Wallet> walletArgumentCaptor;
+    private ArgumentCaptor<List<Wallet>> walletsArgumentCaptor;
 
     @Test
-    void createWallet_success() {
-        WalletRequest request = WalletRequestFixture.aDefaultWalletRequest();
-        Player player = PlayerFixture.aDefaultPlayer();
+    void createWallet_playersList() {
         Currency currency = CurrencyFixture.aDefaultCurrency();
-        Game game = GameFixture.aDefaultGame();
-        Wallet expected = WalletFixture.aDefaultWallet();
+        Player player1 = PlayerFixture.aDefaultPlayer();
+        Player player2 = PlayerFixture.aDefaultPlayer();
+        List<Player> players = List.of(player1, player2);
+        List<Wallet> expected = List.of(
+                Wallet.builder().amount(0).player(player1).currency(currency).build(),
+                Wallet.builder().amount(0).player(player2).currency(currency).build()
+        );
 
-        when(gameService.getAuthenicatedGame()).thenReturn(game);
-        when(currencyService.getCurrencyById(game, request.currencyId())).thenReturn(currency);
-        when(walletRepo.existsByPlayerAndCurrency(player, currency)).thenReturn(false);
-        when(walletMapper.fromRequest(request)).thenReturn(expected);
-        when(walletRepo.saveAndFlush(any(Wallet.class))).thenReturn(expected);
+        walletService.createWallets(currency, players);
 
-        Wallet result = walletService.createWallet(request, player);
+        verify(walletRepo).saveAllAndFlush(walletsArgumentCaptor.capture());
 
-        verify(gameService).getAuthenicatedGame();
-        verify(currencyService).getCurrencyById(game, request.currencyId());
-        verify(walletRepo).existsByPlayerAndCurrency(player, currency);
-        verify(walletMapper).fromRequest(request);
-        verify(walletRepo).saveAndFlush(walletArgumentCaptor.capture());
-
-        assertEquals(expected, result);
-        assertEquals(currency, walletArgumentCaptor.getValue().getCurrency());
-        assertEquals(player, walletArgumentCaptor.getValue().getPlayer());
+        assertEquals(expected, walletsArgumentCaptor.getValue());
     }
 
     @Test
-    void createWallet_alreadyExists() {
-        WalletRequest request = WalletRequestFixture.aDefaultWalletRequest();
+    void createWallet_currencyList() {
+        Currency currency1 = CurrencyFixture.aDefaultCurrency();
+        Currency currency2 = CurrencyFixture.aDefaultCurrency();
         Player player = PlayerFixture.aDefaultPlayer();
-        Currency currency = CurrencyFixture.aDefaultCurrency();
-        Game game = GameFixture.aDefaultGame();
+        List<Currency> currencies = List.of(currency1, currency2);
+        List<Wallet> expected = List.of(
+                Wallet.builder().amount(0).player(player).currency(currency1).build(),
+                Wallet.builder().amount(0).player(player).currency(currency2).build()
+        );
 
-        when(gameService.getAuthenicatedGame()).thenReturn(game);
-        when(currencyService.getCurrencyById(game, request.currencyId())).thenReturn(currency);
-        when(walletRepo.existsByPlayerAndCurrency(player, currency)).thenReturn(true);
+        walletService.createWallets(currencies, player);
 
-        ApiException result = assertThrows(ApiException.class, () -> walletService.createWallet(request, player));
+        verify(walletRepo).saveAllAndFlush(walletsArgumentCaptor.capture());
 
-        verify(gameService).getAuthenicatedGame();
-        verify(currencyService).getCurrencyById(game, request.currencyId());
-        verify(walletRepo).existsByPlayerAndCurrency(player, currency);
-        verify(walletMapper, never()).fromRequest(request);
-        verify(walletRepo, never()).saveAndFlush(any(Wallet.class));
-
-        assertEquals(ErrorCodes.WALLET_ALREADY_EXISTS, result.getErrorKey());
+        assertEquals(expected, walletsArgumentCaptor.getValue());
     }
 
     @Test

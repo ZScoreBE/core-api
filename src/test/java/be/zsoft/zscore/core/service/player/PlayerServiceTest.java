@@ -228,6 +228,23 @@ class PlayerServiceTest {
         verify(playerRepo).delete(player);
     }
 
+    @Test
+    void getAllPlayersByGame() {
+        Game game = GameFixture.aDefaultGame();
+        List<Player> expected = List.of(
+                PlayerFixture.aDefaultPlayer(),
+                PlayerFixture.aDefaultPlayer()
+        );
+
+        when(playerRepo.findAllByGame(game)).thenReturn(expected);
+
+        List<Player> result = playerService.getAllPlayersByGame(game);
+
+        verify(playerRepo).findAllByGame(game);
+
+        assertEquals(expected, result);
+    }
+
     private void mockLocalDateTimeNow() {
         when(clock.instant()).thenReturn(Instant.parse("2000-01-01T10:30:00Z"));
         when(clock.getZone()).thenReturn(ZoneId.of("UTC"));

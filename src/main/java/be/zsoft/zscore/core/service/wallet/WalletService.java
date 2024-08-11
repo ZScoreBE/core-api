@@ -1,21 +1,16 @@
 package be.zsoft.zscore.core.service.wallet;
 
-import be.zsoft.zscore.core.ErrorCodes;
-import be.zsoft.zscore.core.common.exception.ApiException;
 import be.zsoft.zscore.core.common.exception.NotFoundException;
-import be.zsoft.zscore.core.dto.mapper.wallet.WalletMapper;
-import be.zsoft.zscore.core.dto.request.wallet.WalletRequest;
 import be.zsoft.zscore.core.entity.currency.Currency;
 import be.zsoft.zscore.core.entity.player.Player;
 import be.zsoft.zscore.core.entity.wallet.Wallet;
 import be.zsoft.zscore.core.repository.wallet.WalletRepo;
-import be.zsoft.zscore.core.service.currency.CurrencyService;
-import be.zsoft.zscore.core.service.game.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -23,22 +18,21 @@ import java.util.UUID;
 public class WalletService {
 
     private final WalletRepo walletRepo;
-    private final WalletMapper walletMapper;
-    private final CurrencyService currencyService;
-    private final GameService gameService;
 
-    public Wallet createWallet(WalletRequest request, Player player) {
-        Currency currency = currencyService.getCurrencyById(gameService.getAuthenicatedGame() ,request.currencyId());
+    public void createWallets(Currency currency, List<Player> players) {
+        List<Wallet> wallets = players.stream()
+                .map(player -> new Wallet(null, 0, player, currency))
+                .toList();
 
-        if (walletRepo.existsByPlayerAndCurrency(player, currency)) {
-            throw new ApiException(ErrorCodes.WALLET_ALREADY_EXISTS);
-        }
+        walletRepo.saveAllAndFlush(wallets);
+    }
 
-        Wallet wallet = walletMapper.fromRequest(request);
-        wallet.setCurrency(currency);
-        wallet.setPlayer(player);
+    public void createWallets(List<Currency> currencies, Player player) {
+        List<Wallet> wallets = currencies.stream()
+                .map(currency -> new Wallet(null, 0, player, currency))
+                .toList();
 
-        return walletRepo.saveAndFlush(wallet);
+        walletRepo.saveAllAndFlush(wallets);
     }
 
     public Page<Wallet> getWalletsByPlayer(Player player, Pageable pageable) {

@@ -1,7 +1,6 @@
 package be.zsoft.zscore.core.dto.mapper.wallet;
 
 import be.zsoft.zscore.core.dto.mapper.currency.CurrencyMapper;
-import be.zsoft.zscore.core.dto.request.wallet.WalletRequest;
 import be.zsoft.zscore.core.dto.response.currency.CurrencyResponse;
 import be.zsoft.zscore.core.dto.response.wallet.WalletResponse;
 import be.zsoft.zscore.core.entity.currency.Currency;
@@ -31,18 +30,6 @@ class WalletMapperTest {
 
     @InjectMocks
     private WalletMapper walletMapper;
-
-    @Test
-    void fromRequest() {
-        WalletRequest walletRequest = new WalletRequest(2000, UUID.randomUUID());
-        Wallet expected = Wallet.builder()
-                .amount(2000)
-                .build();
-
-        Wallet result = walletMapper.fromRequest(walletRequest);
-
-        assertEquals(expected, result);
-    }
 
     @Test
     void toResponse_single() {
