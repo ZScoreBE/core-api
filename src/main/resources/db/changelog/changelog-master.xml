@@ -21,5 +21,6 @@
     <include file="db/changelog/v1.1.0/02-currency_offer.xml" relativeToChangelogFile="false" />
     <include file="db/changelog/v1.1.0/03-wallet.xml" relativeToChangelogFile="false" />
     <include file="db/changelog/v1.1.0/04-wallet_operation.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.1.0/05-player_life_settings.xml" relativeToChangelogFile="false" />
 
 </databaseChangeLog>

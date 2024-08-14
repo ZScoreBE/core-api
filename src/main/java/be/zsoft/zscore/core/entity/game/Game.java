@@ -2,6 +2,7 @@ package be.zsoft.zscore.core.entity.game;
 
 import be.zsoft.zscore.core.entity.BaseEntity;
 import be.zsoft.zscore.core.entity.organization.Organization;
+import be.zsoft.zscore.core.entity.player.PlayerLifeSettings;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -50,4 +51,7 @@ public class Game extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
+
+    @OneToOne(mappedBy = "game")
+    private PlayerLifeSettings playerLifeSettings;
 }
