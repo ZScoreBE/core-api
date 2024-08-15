@@ -12,9 +12,29 @@ public class PlayerLifeSettingsFixture {
     public static PlayerLifeSettings aDefaultPlayerLifeSettings() {
         return PlayerLifeSettings.builder()
                 .id(UUID.randomUUID())
+                .enabled(true)
+                .maxLives(10)
+                .giveLifeAfterSeconds(900)
+                .game(GameFixture.aDefaultGame())
+                .build();
+    }
+
+    public static PlayerLifeSettings aDisabledPlayerLifeSettings() {
+        return PlayerLifeSettings.builder()
+                .id(UUID.randomUUID())
                 .enabled(false)
                 .maxLives(10)
                 .giveLifeAfterSeconds(900)
+                .game(GameFixture.aDefaultGame())
+                .build();
+    }
+
+    public static PlayerLifeSettings aPlayerLifeSettingsWithNoAutomaticLives() {
+        return PlayerLifeSettings.builder()
+                .id(UUID.randomUUID())
+                .enabled(true)
+                .maxLives(10)
+                .giveLifeAfterSeconds(null)
                 .game(GameFixture.aDefaultGame())
                 .build();
     }

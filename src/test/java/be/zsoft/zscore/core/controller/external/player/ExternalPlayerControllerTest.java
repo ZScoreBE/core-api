@@ -70,4 +70,52 @@ class ExternalPlayerControllerTest {
         verify(walletService).createWallets(currencies, player);
         verify(playerMapper).toResponse(player);
     }
+
+    @Test
+    void getMyself() {
+        Player player = PlayerFixture.aDefaultPlayer();
+        PlayerResponse expected = PlayerResponseFixture.aDefaultPlayerResponse();
+
+        when(playerService.updateAuthenticatedPlayerLivesOnCount()).thenReturn(player);
+        when(playerMapper.toResponse(player)).thenReturn(expected);
+
+        PlayerResponse result = externalPlayerController.getMyself();
+
+        verify(playerService).updateAuthenticatedPlayerLivesOnCount();
+        verify(playerMapper).toResponse(player);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void takeLives() {
+        Player player = PlayerFixture.aDefaultPlayer();
+        PlayerResponse expected = PlayerResponseFixture.aDefaultPlayerResponse();
+
+        when(playerService.takeLives(1)).thenReturn(player);
+        when(playerMapper.toResponse(player)).thenReturn(expected);
+
+        PlayerResponse result = externalPlayerController.takeLife(1);
+
+        verify(playerService).takeLives(1);
+        verify(playerMapper).toResponse(player);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void giveLives() {
+        Player player = PlayerFixture.aDefaultPlayer();
+        PlayerResponse expected = PlayerResponseFixture.aDefaultPlayerResponse();
+
+        when(playerService.giveLives(1)).thenReturn(player);
+        when(playerMapper.toResponse(player)).thenReturn(expected);
+
+        PlayerResponse result = externalPlayerController.giveLife(1);
+
+        verify(playerService).giveLives(1);
+        verify(playerMapper).toResponse(player);
+
+        assertEquals(expected, result);
+    }
 }

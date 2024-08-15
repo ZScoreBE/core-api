@@ -84,4 +84,18 @@ class PlayerLifeSettingsServiceTest {
         assertEquals(expected, result);
         assertEquals(game, playerLifeSettingsArgumentCaptor.getValue().getGame());
     }
+
+    @Test
+    void getPlayerLifeSettingsAsOptional() {
+        Game game = GameFixture.aDefaultGame();
+        Optional<PlayerLifeSettings> expected = Optional.of(PlayerLifeSettingsFixture.aDefaultPlayerLifeSettings());
+
+        when(playerLifeSettingsRepo.findByGame(game)).thenReturn(expected);
+
+        Optional<PlayerLifeSettings> result = playerLifeSettingsService.getPlayerLifeSettingsAsOptional(game);
+
+        verify(playerLifeSettingsRepo).findByGame(game);
+
+        assertEquals(expected, result);
+    }
 }

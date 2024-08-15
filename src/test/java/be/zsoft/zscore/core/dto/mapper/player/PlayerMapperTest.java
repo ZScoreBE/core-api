@@ -52,8 +52,10 @@ class PlayerMapperTest {
                 .id(id)
                 .name("wout")
                 .lastSignIn(now)
+                .currentLives(10)
+                .lastLifeUpdate(now)
                 .build();
-        PlayerResponse expected = new PlayerResponse(id, "wout", now);
+        PlayerResponse expected = new PlayerResponse(id, "wout", now, 10, now);
 
         PlayerResponse result = playerMapper.toResponse(player);
 
@@ -69,16 +71,20 @@ class PlayerMapperTest {
                 .id(id1)
                 .name("wout")
                 .lastSignIn(now)
+                .currentLives(10)
+                .lastLifeUpdate(now)
                 .build();
         Player player2 = Player.builder()
                 .id(id2)
                 .name("wout")
                 .lastSignIn(now)
+                .currentLives(10)
+                .lastLifeUpdate(now)
                 .build();
         Page<PlayerResponse> expected = new PageImpl<>(
                 List.of(
-                        new PlayerResponse(id1, "wout", now),
-                        new PlayerResponse(id2, "wout", now)
+                        new PlayerResponse(id1, "wout", now, 10, now),
+                        new PlayerResponse(id2, "wout", now, 10, now)
                 )
         );
 

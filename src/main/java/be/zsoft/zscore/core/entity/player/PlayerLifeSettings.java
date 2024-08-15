@@ -39,5 +39,6 @@ public class PlayerLifeSettings extends BaseEntity {
 
     @OneToOne
     @JoinColumn(name = "game_id", nullable = false)
+    @ToString.Exclude
     private Game game;
 }

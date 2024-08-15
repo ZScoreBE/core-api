@@ -43,5 +43,31 @@ public class ExternalPlayerController {
 
         return playerMapper.toResponse(player);
     }
+
+    @Secured({"ROLE_PLAYER"})
+    @GetMapping("/myself")
+    @ResponseBody
+    public PlayerResponse getMyself() {
+        Player player = playerService.updateAuthenticatedPlayerLivesOnCount();
+        return playerMapper.toResponse(player);
+    }
+
+    @Secured({"ROLE_PLAYER"})
+    @PatchMapping("/myself/take-life")
+    @ResponseBody
+    @Transactional
+    public PlayerResponse takeLife(@RequestParam(name = "amount", required = false, defaultValue = "1") int amount) {
+        Player player = playerService.takeLives(amount);
+        return playerMapper.toResponse(player);
+    }
+
+    @Secured({"ROLE_PLAYER"})
+    @PatchMapping("/myself/give-life")
+    @ResponseBody
+    @Transactional
+    public PlayerResponse giveLife(@RequestParam(name = "amount", required = false, defaultValue = "1") int amount) {
+        Player player = playerService.giveLives(amount);
+        return playerMapper.toResponse(player);
+    }
 }
 

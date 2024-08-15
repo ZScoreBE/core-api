@@ -22,5 +22,6 @@
     <include file="db/changelog/v1.1.0/03-wallet.xml" relativeToChangelogFile="false" />
     <include file="db/changelog/v1.1.0/04-wallet_operation.xml" relativeToChangelogFile="false" />
     <include file="db/changelog/v1.1.0/05-player_life_settings.xml" relativeToChangelogFile="false" />
+    <include file="db/changelog/v1.1.0/06-player_life_columns.xml" relativeToChangelogFile="false" />
 
 </databaseChangeLog>

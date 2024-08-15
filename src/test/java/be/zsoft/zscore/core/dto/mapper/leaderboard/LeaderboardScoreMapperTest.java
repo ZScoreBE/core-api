@@ -31,15 +31,19 @@ class LeaderboardScoreMapperTest {
 
     @Test
     void toResponse_single() {
-        Player player = Player.builder().id(UUID.randomUUID()).build();
+        LocalDateTime now = LocalDateTime.now();
+        Player player = Player.builder()
+                .id(UUID.randomUUID())
+                .build();
         UUID id1 = UUID.randomUUID();
+
         LeaderboardScore score1 = LeaderboardScore.builder()
                 .id(id1)
                 .score(100)
                 .player(player)
                 .build();
 
-        PlayerResponse playerResponse = new PlayerResponse(UUID.randomUUID(), "player", LocalDateTime.now());
+        PlayerResponse playerResponse = new PlayerResponse(UUID.randomUUID(), "player", now, 10, now);
         LeaderboardScoreResponse expected = new LeaderboardScoreResponse(id1, 100, playerResponse);
 
         when(playerMapper.toResponse(player)).thenReturn(playerResponse);
@@ -53,6 +57,7 @@ class LeaderboardScoreMapperTest {
 
     @Test
     void toResponse_page() {
+        LocalDateTime now = LocalDateTime.now();
         Player player = Player.builder().id(UUID.randomUUID()).build();
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
@@ -67,7 +72,7 @@ class LeaderboardScoreMapperTest {
                 .player(player)
                 .build();
 
-        PlayerResponse playerResponse = new PlayerResponse(UUID.randomUUID(), "player", LocalDateTime.now());
+        PlayerResponse playerResponse = new PlayerResponse(UUID.randomUUID(), "player", now, 10, now);
         Page<LeaderboardScoreResponse> expected = new PageImpl<>(List.of(
                 new LeaderboardScoreResponse(id1, 100, playerResponse),
                 new LeaderboardScoreResponse(id2, 100, playerResponse)

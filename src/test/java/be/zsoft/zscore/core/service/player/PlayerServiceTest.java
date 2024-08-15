@@ -1,12 +1,15 @@
 package be.zsoft.zscore.core.service.player;
 
+import be.zsoft.zscore.core.common.exception.ApiException;
 import be.zsoft.zscore.core.common.exception.NotFoundException;
 import be.zsoft.zscore.core.dto.mapper.player.PlayerMapper;
 import be.zsoft.zscore.core.dto.request.player.PlayerRequest;
 import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.entity.player.Player;
+import be.zsoft.zscore.core.entity.player.PlayerLifeSettings;
 import be.zsoft.zscore.core.fixtures.game.GameFixture;
 import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
+import be.zsoft.zscore.core.fixtures.player.PlayerLifeSettingsFixture;
 import be.zsoft.zscore.core.fixtures.player.PlayerRequestFixtures;
 import be.zsoft.zscore.core.repository.player.PlayerRepo;
 import be.zsoft.zscore.core.security.dto.AuthenticationData;
@@ -35,11 +38,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PlayerServiceTest {
@@ -55,6 +56,9 @@ class PlayerServiceTest {
 
     @Mock
     private Clock clock;
+
+    @Mock
+    private PlayerLifeSettingsService playerLifeSettingsService;
 
     @InjectMocks
     private PlayerService playerService;
@@ -243,6 +247,233 @@ class PlayerServiceTest {
         verify(playerRepo).findAllByGame(game);
 
         assertEquals(expected, result);
+    }
+
+    @Test
+    void updateAuthenticatedPlayerLivesOnCount_disabled() {
+        Player expected = PlayerFixture.aDefaultPlayer();
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, expected,null, null), "", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        PlayerLifeSettings settings = PlayerLifeSettingsFixture.aDisabledPlayerLifeSettings();
+        when(playerLifeSettingsService.getPlayerLifeSettingsAsOptional(expected.getGame())).thenReturn(Optional.of(settings));
+        when(playerRepo.saveAndFlush(any(Player.class))).thenReturn(expected);
+
+        Player result = playerService.updateAuthenticatedPlayerLivesOnCount();
+
+        verify(playerLifeSettingsService).getPlayerLifeSettingsAsOptional(expected.getGame());
+        verify(playerRepo).saveAndFlush(playerArgumentCaptor.capture());
+
+        assertEquals(expected, result);
+        assertNull(playerArgumentCaptor.getValue().getCurrentLives());
+        assertNull(playerArgumentCaptor.getValue().getLastLifeUpdate());
+
+    }
+
+    @Test
+    void updateAuthenticatedPlayerLivesOnCount_enabled_giveLifeAfterSecondsNull() {
+        Player expected = PlayerFixture.aDefaultPlayer();
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, expected,null, null), "", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        PlayerLifeSettings settings = PlayerLifeSettingsFixture.aPlayerLifeSettingsWithNoAutomaticLives();
+        when(playerLifeSettingsService.getPlayerLifeSettingsAsOptional(expected.getGame())).thenReturn(Optional.of(settings));
+
+        Player result = playerService.updateAuthenticatedPlayerLivesOnCount();
+
+        verify(playerLifeSettingsService).getPlayerLifeSettingsAsOptional(expected.getGame());
+        verify(playerRepo, never()).saveAndFlush(any(Player.class));
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void updateAuthenticatedPlayerLivesOnCount_enabled_currentLivesAndLastLifeUpdateNull() {
+        Player expected = PlayerFixture.aPlayerWithCurrentLivesAndLastLifeUpdateNull();
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, expected,null, null), "", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        PlayerLifeSettings settings = PlayerLifeSettingsFixture.aDefaultPlayerLifeSettings();
+        when(playerLifeSettingsService.getPlayerLifeSettingsAsOptional(expected.getGame())).thenReturn(Optional.of(settings));
+        when(playerRepo.saveAndFlush(any(Player.class))).thenReturn(expected);
+        mockLocalDateTimeNow();
+
+        Player result = playerService.updateAuthenticatedPlayerLivesOnCount();
+
+        verify(playerLifeSettingsService).getPlayerLifeSettingsAsOptional(expected.getGame());
+        verify(playerRepo).saveAndFlush(playerArgumentCaptor.capture());
+
+        assertEquals(expected, result);
+        assertEquals(10, playerArgumentCaptor.getValue().getCurrentLives());
+        assertEquals(LocalDateTime.now(clock), playerArgumentCaptor.getValue().getLastLifeUpdate());
+    }
+
+    @Test
+    void updateAuthenticatedPlayerLivesOnCount_enabled_normalUpdate() {
+        mockLocalDateTimeNow();
+
+        LocalDateTime now = LocalDateTime.now(clock);
+        Player expected = PlayerFixture.aDefaultPlayer();
+        expected.setCurrentLives(1);
+        expected.setLastLifeUpdate(now.minusSeconds(2000)); // 2 Lives & 200 seconds rest
+
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, expected,null, null), "", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        PlayerLifeSettings settings = PlayerLifeSettingsFixture.aDefaultPlayerLifeSettings();
+        when(playerLifeSettingsService.getPlayerLifeSettingsAsOptional(expected.getGame())).thenReturn(Optional.of(settings));
+        when(playerRepo.saveAndFlush(any(Player.class))).thenReturn(expected);
+
+        Player result = playerService.updateAuthenticatedPlayerLivesOnCount();
+
+        verify(playerLifeSettingsService).getPlayerLifeSettingsAsOptional(expected.getGame());
+        verify(playerRepo).saveAndFlush(playerArgumentCaptor.capture());
+
+        assertEquals(expected, result);
+        assertEquals(3, playerArgumentCaptor.getValue().getCurrentLives());
+        assertEquals(LocalDateTime.now(clock).minusSeconds(200), playerArgumentCaptor.getValue().getLastLifeUpdate());
+    }
+
+    @Test
+    void takeLives_amountWrong() {
+        ApiException ex = assertThrows(ApiException.class, () -> playerService.takeLives(-1));
+
+        verify(playerLifeSettingsService, never()).getPlayerLifeSettingsAsOptional(any(Game.class));
+        verify(playerRepo, never()).saveAndFlush(any(Player.class));
+
+        assertEquals("TAKE_LIFE_AMOUNT_MIN_NEEDS_TO_BE_1", ex.getErrorKey());
+    }
+
+    @Test
+    void takeLives_playerLifeNotEnabled() {
+        Player expected = PlayerFixture.aPlayerWithCurrentLivesAndLastLifeUpdateNull();
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, expected,null, null), "", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        PlayerLifeSettings settings = PlayerLifeSettingsFixture.aDisabledPlayerLifeSettings();
+        when(playerLifeSettingsService.getPlayerLifeSettingsAsOptional(expected.getGame())).thenReturn(Optional.of(settings));
+
+        ApiException ex = assertThrows(ApiException.class, () -> playerService.takeLives(1));
+
+        verify(playerLifeSettingsService).getPlayerLifeSettingsAsOptional(expected.getGame());
+        verify(playerRepo, never()).saveAndFlush(any(Player.class));
+
+        assertEquals("PLAYER_LIFE_NOT_ENABLED", ex.getErrorKey());
+    }
+
+    @Test
+    void takeLives_takeToZero() {
+        mockLocalDateTimeNow();
+
+        Player expected = PlayerFixture.aDefaultPlayer();
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, expected,null, null), "", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        PlayerLifeSettings settings = PlayerLifeSettingsFixture.aDefaultPlayerLifeSettings();
+        when(playerLifeSettingsService.getPlayerLifeSettingsAsOptional(expected.getGame())).thenReturn(Optional.of(settings));
+        when(playerRepo.saveAndFlush(any(Player.class))).thenReturn(expected);
+
+        Player result = playerService.takeLives(1000);
+
+        verify(playerLifeSettingsService).getPlayerLifeSettingsAsOptional(expected.getGame());
+        verify(playerRepo).saveAndFlush(playerArgumentCaptor.capture());
+
+        assertEquals(expected, result);
+        assertEquals(0, playerArgumentCaptor.getValue().getCurrentLives());
+    }
+
+    @Test
+    void takeLives_normalUpdate() {
+        mockLocalDateTimeNow();
+
+        Player expected = PlayerFixture.aDefaultPlayer();
+        expected.setCurrentLives(2);
+        expected.setLastLifeUpdate(LocalDateTime.now(clock));
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, expected,null, null), "", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        PlayerLifeSettings settings = PlayerLifeSettingsFixture.aDefaultPlayerLifeSettings();
+        when(playerLifeSettingsService.getPlayerLifeSettingsAsOptional(expected.getGame())).thenReturn(Optional.of(settings));
+        when(playerRepo.saveAndFlush(any(Player.class))).thenReturn(expected);
+
+        Player result = playerService.takeLives(1);
+
+        verify(playerLifeSettingsService).getPlayerLifeSettingsAsOptional(expected.getGame());
+        verify(playerRepo).saveAndFlush(playerArgumentCaptor.capture());
+
+        assertEquals(expected, result);
+        assertEquals(1, playerArgumentCaptor.getValue().getCurrentLives());
+    }
+
+    @Test
+    void giveLives_amountWrong() {
+        ApiException ex = assertThrows(ApiException.class, () -> playerService.giveLives(-1));
+
+        verify(playerLifeSettingsService, never()).getPlayerLifeSettingsAsOptional(any(Game.class));
+        verify(playerRepo, never()).saveAndFlush(any(Player.class));
+
+        assertEquals("GIVE_LIFE_AMOUNT_MIN_NEEDS_TO_BE_1", ex.getErrorKey());
+    }
+
+    @Test
+    void giveLives_playerLifeNotEnabled() {
+        Player expected = PlayerFixture.aPlayerWithCurrentLivesAndLastLifeUpdateNull();
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, expected,null, null), "", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        PlayerLifeSettings settings = PlayerLifeSettingsFixture.aDisabledPlayerLifeSettings();
+        when(playerLifeSettingsService.getPlayerLifeSettingsAsOptional(expected.getGame())).thenReturn(Optional.of(settings));
+
+        ApiException ex = assertThrows(ApiException.class, () -> playerService.giveLives(1));
+
+        verify(playerLifeSettingsService).getPlayerLifeSettingsAsOptional(expected.getGame());
+        verify(playerRepo, never()).saveAndFlush(any(Player.class));
+
+        assertEquals("PLAYER_LIFE_NOT_ENABLED", ex.getErrorKey());
+    }
+
+    @Test
+    void giveLives_maxLives() {
+        mockLocalDateTimeNow();
+
+        Player expected = PlayerFixture.aDefaultPlayer();
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, expected,null, null), "", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        PlayerLifeSettings settings = PlayerLifeSettingsFixture.aDefaultPlayerLifeSettings();
+        when(playerLifeSettingsService.getPlayerLifeSettingsAsOptional(expected.getGame())).thenReturn(Optional.of(settings));
+        when(playerRepo.saveAndFlush(any(Player.class))).thenReturn(expected);
+
+        Player result = playerService.giveLives(1000);
+
+        verify(playerLifeSettingsService).getPlayerLifeSettingsAsOptional(expected.getGame());
+        verify(playerRepo).saveAndFlush(playerArgumentCaptor.capture());
+
+        assertEquals(expected, result);
+        assertEquals(10, playerArgumentCaptor.getValue().getCurrentLives());
+    }
+
+    @Test
+    void giveLives_normalUpdate() {
+        mockLocalDateTimeNow();
+
+        Player expected = PlayerFixture.aDefaultPlayer();
+        expected.setCurrentLives(2);
+        expected.setLastLifeUpdate(LocalDateTime.now(clock));
+        Authentication auth = new ZScoreAuthenticationToken(new AuthenticationData(null, expected,null, null), "", null);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        PlayerLifeSettings settings = PlayerLifeSettingsFixture.aDefaultPlayerLifeSettings();
+        when(playerLifeSettingsService.getPlayerLifeSettingsAsOptional(expected.getGame())).thenReturn(Optional.of(settings));
+        when(playerRepo.saveAndFlush(any(Player.class))).thenReturn(expected);
+
+        Player result = playerService.giveLives(2);
+
+        verify(playerLifeSettingsService).getPlayerLifeSettingsAsOptional(expected.getGame());
+        verify(playerRepo).saveAndFlush(playerArgumentCaptor.capture());
+
+        assertEquals(expected, result);
+        assertEquals(4, playerArgumentCaptor.getValue().getCurrentLives());
     }
 
     private void mockLocalDateTimeNow() {

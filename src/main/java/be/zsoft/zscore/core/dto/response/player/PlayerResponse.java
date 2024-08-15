@@ -6,6 +6,8 @@ import java.util.UUID;
 public record PlayerResponse(
         UUID id,
         String name,
-        LocalDateTime lastSignIn
+        LocalDateTime lastSignIn,
+        Integer lives,
+        LocalDateTime lastLifeUpdate
 ) {
 }

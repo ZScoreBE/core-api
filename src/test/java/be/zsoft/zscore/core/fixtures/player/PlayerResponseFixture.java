@@ -13,6 +13,8 @@ public class PlayerResponseFixture {
         return new PlayerResponse(
                 UUID.randomUUID(),
                 "wout",
+                LocalDateTime.now(),
+                10,
                 LocalDateTime.now()
         );
     }

@@ -19,7 +19,13 @@ public class PlayerMapper {
     }
 
     public PlayerResponse toResponse(Player player) {
-        return new PlayerResponse(player.getId(), player.getName(), player.getLastSignIn());
+        return new PlayerResponse(
+                player.getId(),
+                player.getName(),
+                player.getLastSignIn(),
+                player.getCurrentLives(),
+                player.getLastLifeUpdate()
+        );
     }
 
     public Page<PlayerResponse> toResponse(Page<Player> players) {

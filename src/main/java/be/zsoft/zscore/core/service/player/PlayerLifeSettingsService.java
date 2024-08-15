@@ -9,12 +9,18 @@ import be.zsoft.zscore.core.repository.player.PlayerLifeSettingsRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class PlayerLifeSettingsService {
 
     private final PlayerLifeSettingsRepo playerLifeSettingsRepo;
     private final PlayerLifeSettingsMapper playerLifeSettingsMapper;
+
+    public Optional<PlayerLifeSettings> getPlayerLifeSettingsAsOptional(Game game) {
+        return playerLifeSettingsRepo.findByGame(game);
+    }
 
     public PlayerLifeSettings getPlayerLifeSettings(Game game) {
         return playerLifeSettingsRepo.findByGame(game)

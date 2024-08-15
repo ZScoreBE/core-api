@@ -33,6 +33,80 @@ paths:
               schema:
                 $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
 
+  /external/players/myself:
+    get:
+      summary: Get the authenticated player based on the bearer token
+      operationId: getMyself
+      tags:
+        - Players
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+      responses:
+        200:
+          description: The player
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerResponse'
+
+  /external/players/myself/take-life:
+    patch:
+      summary: Take lives from the authenticated player
+      operationId: takeLife
+      tags:
+        - Players
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - in: query
+          name: amount
+          required: false
+          description: How many lives we should take
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: The player
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerResponse'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+  /external/players/myself/give-life:
+    patch:
+      summary: Give lives to the authenticated player
+      operationId: takeLife
+      tags:
+        - Players
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - in: query
+          name: amount
+          required: false
+          description: How many lives should we give
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: The player
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerResponse'
+        400:
+          description: Api Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     PlayerRequest:

@@ -1,10 +1,13 @@
 package be.zsoft.zscore.core.service.player;
 
+import be.zsoft.zscore.core.ErrorCodes;
+import be.zsoft.zscore.core.common.exception.ApiException;
 import be.zsoft.zscore.core.common.exception.NotFoundException;
 import be.zsoft.zscore.core.dto.mapper.player.PlayerMapper;
 import be.zsoft.zscore.core.dto.request.player.PlayerRequest;
 import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.entity.player.Player;
+import be.zsoft.zscore.core.entity.player.PlayerLifeSettings;
 import be.zsoft.zscore.core.repository.player.PlayerRepo;
 import be.zsoft.zscore.core.security.SecurityUtils;
 import be.zsoft.zscore.core.service.game.GameService;
@@ -16,8 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -27,6 +32,7 @@ public class PlayerService {
 
     private final PlayerRepo playerRepo;
     private final PlayerMapper playerMapper;
+    private final PlayerLifeSettingsService playerLifeSettingsService;
     private final GameService gameService;
     private final Clock clock;
 
@@ -79,5 +85,67 @@ public class PlayerService {
 
     public List<Player> getAllPlayersByGame(Game game) {
         return playerRepo.findAllByGame(game);
+    }
+
+    public Player updateAuthenticatedPlayerLivesOnCount() {
+        Player player = getAuthenticatedPlayer();
+        Optional<PlayerLifeSettings> settings = playerLifeSettingsService.getPlayerLifeSettingsAsOptional(player.getGame());
+
+        if (settings.isPresent() && settings.get().isEnabled()) {
+            if (settings.get().getGiveLifeAfterSeconds() == null) return player;
+
+            calculateLivesAndLastLifeUpdate(player, settings.get());
+        } else {
+            player.setCurrentLives(null);
+            player.setLastLifeUpdate(null);
+        }
+
+        return playerRepo.saveAndFlush(player);
+    }
+
+    public Player takeLives(int amount) {
+        if (amount < 1) {
+            throw new ApiException(ErrorCodes.TAKE_LIFE_AMOUNT_MIN_NEEDS_TO_BE_1);
+        }
+
+        Player player = getAuthenticatedPlayer();
+        PlayerLifeSettings settings = playerLifeSettingsService.getPlayerLifeSettingsAsOptional(player.getGame())
+                .filter(PlayerLifeSettings::isEnabled)
+                .orElseThrow(() -> new ApiException(ErrorCodes.PLAYER_LIFE_NOT_ENABLED));
+
+        calculateLivesAndLastLifeUpdate(player, settings);
+        player.setCurrentLives(Math.max(player.getCurrentLives() - amount, 0));
+
+        return playerRepo.saveAndFlush(player);
+    }
+
+    public Player giveLives(int amount) {
+        if (amount < 1) {
+            throw new ApiException(ErrorCodes.GIVE_LIFE_AMOUNT_MIN_NEEDS_TO_BE_1);
+        }
+
+        Player player = getAuthenticatedPlayer();
+        PlayerLifeSettings settings = playerLifeSettingsService.getPlayerLifeSettingsAsOptional(player.getGame())
+                .filter(PlayerLifeSettings::isEnabled)
+                .orElseThrow(() -> new ApiException(ErrorCodes.PLAYER_LIFE_NOT_ENABLED));
+
+        calculateLivesAndLastLifeUpdate(player, settings);
+        player.setCurrentLives(Math.min(player.getCurrentLives() + amount, settings.getMaxLives()));
+
+        return playerRepo.saveAndFlush(player);
+    }
+
+    private void calculateLivesAndLastLifeUpdate(Player player, PlayerLifeSettings settings) {
+        if (player.getCurrentLives() == null && player.getLastLifeUpdate() == null) {
+            player.setCurrentLives(settings.getMaxLives());
+            player.setLastLifeUpdate(LocalDateTime.now(clock));
+            return;
+        }
+
+        long secondsBetween = Math.abs(Duration.between(LocalDateTime.now(clock), player.getLastLifeUpdate()).toSeconds());
+        int periodsPassed = (int) ((double) secondsBetween / settings.getGiveLifeAfterSeconds());
+
+        player.setCurrentLives(Math.min(player.getCurrentLives() + periodsPassed, settings.getMaxLives()));
+        player.setLastLifeUpdate(player.getLastLifeUpdate().plusSeconds((long) settings.getGiveLifeAfterSeconds() * periodsPassed));
     }
 }

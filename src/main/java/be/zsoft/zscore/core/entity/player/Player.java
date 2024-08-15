@@ -38,7 +38,13 @@ public class Player extends BaseEntity implements UserDetails {
     private String name;
 
     @Column(name = "last_sign_in", nullable = true)
-    protected LocalDateTime lastSignIn;
+    private LocalDateTime lastSignIn;
+
+    @Column(name = "current_lives", nullable = true)
+    private Integer currentLives;
+
+    @Column(name = "last_life_update", nullable = true)
+    private LocalDateTime lastLifeUpdate;
 
     @ManyToOne
     @JoinColumn(name = "game_id", nullable = false)
