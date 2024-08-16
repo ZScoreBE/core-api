@@ -29,6 +29,7 @@ public class WalletOperation extends BaseEntity {
     @Column(name = "amount", nullable = false)
     private int amount;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private WalletOperationType type;
 

@@ -6,12 +6,16 @@ import be.zsoft.zscore.core.dto.request.currency.CurrencyRequest;
 import be.zsoft.zscore.core.dto.response.currency.CurrencyResponse;
 import be.zsoft.zscore.core.entity.currency.Currency;
 import be.zsoft.zscore.core.entity.game.Game;
+import be.zsoft.zscore.core.entity.player.Player;
 import be.zsoft.zscore.core.fixtures.currency.CurrencyFixture;
 import be.zsoft.zscore.core.fixtures.currency.CurrencyRequestFixture;
 import be.zsoft.zscore.core.fixtures.currency.CurrencyResponseFixture;
 import be.zsoft.zscore.core.fixtures.game.GameFixture;
+import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
 import be.zsoft.zscore.core.service.currency.CurrencyService;
 import be.zsoft.zscore.core.service.game.GameService;
+import be.zsoft.zscore.core.service.player.PlayerService;
+import be.zsoft.zscore.core.service.wallet.WalletService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,6 +45,12 @@ class CurrencyControllerTest {
     @Mock
     private GameService gameService;
 
+    @Mock
+    private PlayerService playerService;
+
+    @Mock
+    private WalletService walletService;
+
     @InjectMocks
     private CurrencyController currencyController;
 
@@ -50,16 +60,20 @@ class CurrencyControllerTest {
         Game game = GameFixture.aDefaultGame();
         CurrencyRequest request = CurrencyRequestFixture.aDefaultCurrencyRequest();
         Currency currency = CurrencyFixture.aDefaultCurrency();
+        List<Player> players = List.of(PlayerFixture.aDefaultPlayer(), PlayerFixture.aDefaultPlayer());
         CurrencyResponse expected = CurrencyResponseFixture.aDefaultCurrencyResponse();
 
         when(gameService.getById(gameId)).thenReturn(game);
         when(currencyService.createCurrency(game, request)).thenReturn(currency);
+        when(playerService.getAllPlayersByGame(game)).thenReturn(players);
         when(currencyMapper.toResponse(currency)).thenReturn(expected);
 
         CurrencyResponse response = currencyController.createCurrency(gameId, request);
 
         verify(gameService).getById(gameId);
         verify(currencyService).createCurrency(game, request);
+        verify(playerService).getAllPlayersByGame(game);
+        verify(walletService).createWallets(currency, players);
         verify(currencyMapper).toResponse(currency);
 
         assertEquals(expected, response);

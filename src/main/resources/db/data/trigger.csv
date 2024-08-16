@@ -1,0 +1,3 @@
+id;name;key_code;cost_type;reward_type;game_id
+d723ed3b-9c48-44db-9c21-a9bae0e00ba8;Player live;PLV;CURRENCY;LIVES;eceb45dd-8566-4164-835b-148390ac7afa
+daefe2da-8f5e-4983-aa33-c987ed31dcc4;Currency;CRRY;FREE;CURRENCY;eceb45dd-8566-4164-835b-148390ac7afa
