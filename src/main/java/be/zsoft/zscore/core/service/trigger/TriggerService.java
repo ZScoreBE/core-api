@@ -4,8 +4,14 @@ import be.zsoft.zscore.core.common.exception.NotFoundException;
 import be.zsoft.zscore.core.dto.mapper.trigger.TriggerMapper;
 import be.zsoft.zscore.core.dto.request.trigger.TriggerRequest;
 import be.zsoft.zscore.core.entity.game.Game;
+import be.zsoft.zscore.core.entity.player.Player;
 import be.zsoft.zscore.core.entity.trigger.Trigger;
+import be.zsoft.zscore.core.entity.trigger.TriggerCostType;
+import be.zsoft.zscore.core.entity.trigger.TriggerRewardType;
 import be.zsoft.zscore.core.repository.trigger.TriggerRepo;
+import be.zsoft.zscore.core.service.player.PlayerService;
+import be.zsoft.zscore.core.service.wallet.WalletService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +25,8 @@ public class TriggerService {
 
     private final TriggerRepo triggerRepo;
     private final TriggerMapper triggerMapper;
+    private final WalletService walletService;
+    private final PlayerService playerService;
 
     public Trigger createTrigger(TriggerRequest request, Game game) {
         Trigger trigger = triggerMapper.fromRequest(request, game);
@@ -50,5 +58,20 @@ public class TriggerService {
     public void deleteByIdAndGame(UUID id, Game game) {
         Trigger trigger = getTriggerByIdAndGame(id, game);
         triggerRepo.delete(trigger);
+    }
+
+    @Transactional
+    public void executeTrigger(UUID id, Player player) {
+        Trigger trigger = getTriggerByIdAndGame(id, player.getGame());
+
+        if (trigger.getCostType() == TriggerCostType.CURRENCY) {
+            walletService.takeCurrency(player, trigger.getCostCurrency(), trigger.getCostAmount());
+        }
+
+        if (trigger.getRewardType() == TriggerRewardType.LIVES) {
+            playerService.giveLives(trigger.getRewardAmount());
+        } else if (trigger.getRewardType() ==TriggerRewardType.CURRENCY) {
+            walletService.giveCurrency(player, trigger.getRewardCurrency(), trigger.getRewardAmount());
+        }
     }
 }

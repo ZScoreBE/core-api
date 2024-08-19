@@ -10,4 +10,8 @@ public class WalletOperationRequestFixture {
     public static WalletOperationRequest aDefaultWalletOperationRequest() {
         return new WalletOperationRequest(WalletOperationType.INCREASE, 2000);
     }
+
+    public static WalletOperationRequest aDecreaseWalletOperation() {
+        return new WalletOperationRequest(WalletOperationType.DECREASE, 2000);
+    }
 }

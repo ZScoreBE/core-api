@@ -20,4 +20,27 @@ public class TriggerFixture {
                 .rewardAmount(10)
                 .build();
     }
+
+    public static Trigger aCostFreeRewardCurrencyTrigger() {
+        return Trigger.builder()
+                .id(UUID.randomUUID())
+                .name("Give currency")
+                .key("GCY")
+                .costType(TriggerCostType.FREE)
+                .rewardType(TriggerRewardType.CURRENCY)
+                .rewardAmount(100)
+                .build();
+    }
+
+    public static Trigger aCostCurrencyRewardLivesTrigger() {
+        return Trigger.builder()
+                .id(UUID.randomUUID())
+                .name("Reward lives")
+                .key("RLVS")
+                .costType(TriggerCostType.CURRENCY)
+                .costAmount(100)
+                .rewardType(TriggerRewardType.LIVES)
+                .rewardAmount(100)
+                .build();
+    }
 }

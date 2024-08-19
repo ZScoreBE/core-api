@@ -3,12 +3,18 @@ package be.zsoft.zscore.core.service.trigger;
 import be.zsoft.zscore.core.common.exception.NotFoundException;
 import be.zsoft.zscore.core.dto.mapper.trigger.TriggerMapper;
 import be.zsoft.zscore.core.dto.request.trigger.TriggerRequest;
+import be.zsoft.zscore.core.entity.currency.Currency;
 import be.zsoft.zscore.core.entity.game.Game;
+import be.zsoft.zscore.core.entity.player.Player;
 import be.zsoft.zscore.core.entity.trigger.Trigger;
+import be.zsoft.zscore.core.fixtures.currency.CurrencyFixture;
 import be.zsoft.zscore.core.fixtures.game.GameFixture;
+import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
 import be.zsoft.zscore.core.fixtures.trigger.TriggerFixture;
 import be.zsoft.zscore.core.fixtures.trigger.TriggerRequestFixture;
 import be.zsoft.zscore.core.repository.trigger.TriggerRepo;
+import be.zsoft.zscore.core.service.player.PlayerService;
+import be.zsoft.zscore.core.service.wallet.WalletService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -27,8 +33,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TriggerServiceTest {
@@ -38,6 +43,12 @@ class TriggerServiceTest {
 
     @Mock
     private TriggerMapper triggerMapper;
+
+    @Mock
+    private WalletService walletService;
+
+    @Mock
+    private PlayerService playerService;
 
     @InjectMocks
     private TriggerService triggerService;
@@ -158,5 +169,44 @@ class TriggerServiceTest {
 
         verify(triggerRepo).findByIdAndGame(id, game);
         verify(triggerRepo).delete(expected);
+    }
+
+    @Test
+    void executeTrigger_costFree_rewardCurrency() {
+        UUID id = UUID.randomUUID();
+        Game game = GameFixture.aDefaultGame();
+        Player player = PlayerFixture.aDefaultPlayer();
+        player.setGame(game);
+        Currency currency = CurrencyFixture.aDefaultCurrency();
+        Trigger trigger = TriggerFixture.aCostFreeRewardCurrencyTrigger();
+        trigger.setCostCurrency(currency);
+        trigger.setRewardCurrency(currency);
+
+        when(triggerRepo.findByIdAndGame(id, game)).thenReturn(Optional.of(trigger));
+
+        triggerService.executeTrigger(id, player);
+
+        verify(walletService, never()).takeCurrency(player, currency, 100);
+        verify(playerService, never()).giveLives(anyInt());
+        verify(walletService).giveCurrency(player, currency, 100);
+    }
+
+    @Test
+    void executeTrigger_costCurrency_rewardLives() {
+        UUID id = UUID.randomUUID();
+        Game game = GameFixture.aDefaultGame();
+        Player player = PlayerFixture.aDefaultPlayer();
+        player.setGame(game);
+        Currency currency = CurrencyFixture.aDefaultCurrency();
+        Trigger trigger = TriggerFixture.aCostCurrencyRewardLivesTrigger();
+        trigger.setCostCurrency(currency);
+
+        when(triggerRepo.findByIdAndGame(id, game)).thenReturn(Optional.of(trigger));
+
+        triggerService.executeTrigger(id, player);
+
+        verify(walletService).takeCurrency(player, currency, 100);
+        verify(playerService).giveLives(100);
+        verify(walletService, never()).giveCurrency(player, currency, 100);
     }
 }

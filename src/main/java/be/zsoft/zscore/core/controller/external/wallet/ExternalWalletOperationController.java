@@ -10,6 +10,7 @@ import be.zsoft.zscore.core.entity.wallet.WalletOperation;
 import be.zsoft.zscore.core.service.player.PlayerService;
 import be.zsoft.zscore.core.service.wallet.WalletOperationService;
 import be.zsoft.zscore.core.service.wallet.WalletService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,10 +35,11 @@ public class ExternalWalletOperationController {
     @PostMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
     public WalletOperationResponse createWalletOperation(
             @PathVariable UUID walletId, @Valid @RequestBody WalletOperationRequest request) {
         Player player = playerService.getAuthenticatedPlayer();
-        Wallet wallet = walletService.getWalletById(walletId, player);
+        Wallet wallet = walletService.updateWalletAmount(walletId, player, request);
 
         WalletOperation operation = walletOperationService.createWalletOperation(request, wallet);
 

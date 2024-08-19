@@ -60,14 +60,14 @@ class ExternalWalletOperationControllerTest {
         WalletOperationResponse expected = WalletOperationResponseFixture.aDefaultWalletOperationResponse();
 
         when(playerService.getAuthenticatedPlayer()).thenReturn(player);
-        when(walletService.getWalletById(walletId, player)).thenReturn(wallet);
+        when(walletService.updateWalletAmount(walletId, player, request)).thenReturn(wallet);
         when(walletOperationService.createWalletOperation(request, wallet)).thenReturn(walletOperation);
         when(walletOperationMapper.toResponse(walletOperation)).thenReturn(expected);
 
         WalletOperationResponse result = externalWalletOperationController.createWalletOperation(walletId, request);
 
         verify(playerService).getAuthenticatedPlayer();
-        verify(walletService).getWalletById(walletId, player);
+        verify(walletService).updateWalletAmount(walletId, player, request);
         verify(walletOperationService).createWalletOperation(request, wallet);
         verify(walletOperationMapper).toResponse(walletOperation);
 

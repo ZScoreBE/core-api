@@ -1,0 +1,131 @@
+openapi: 3.0.3
+info:
+  title: External API
+  description: Rest API to use in your games
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /external/triggers:
+    get:
+      summary: Get triggers
+      operationId: getTriggers
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - $ref: './external_api_common_components.yaml#/components/parameters/pageQueryParam'
+        - $ref: './external_api_common_components.yaml#/components/parameters/sizeQueryParam'
+      responses:
+        200:
+          description: The triggers for a player
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerResponseList'
+
+  /external/triggers/{id}/execute:
+    post:
+      summary: Execute trigger
+      operationId: executeTriger
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - in: path
+          name: id
+          required: true
+          description: The trigger ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: 'Execution success'
+        400:
+          description: API Error
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: './external_api_common_components.yaml#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    TriggerResponse:
+      readOnly: true
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        key:
+          type: string
+          nullable: false
+        costType:
+          type: string
+          nullable: false
+          enum: [ FREE, CURRENCY ]
+        costAmount:
+          type: integer
+          nullable: true
+        costCurrency:
+          $ref: '#/components/schemas/CurrencyResponse'
+        rewardType:
+          type: string
+          nullable: false
+          enum: [ LIVES, CURRENCY ]
+        rewardAmount:
+          type: integer
+          nullable: true
+        rewardCurrency:
+          $ref: '#/components/schemas/CurrencyResponse'
+
+    CurrencyResponse:
+      readOnly: true
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        key:
+          type: string
+          nullable: false
+
+    TriggerResponseList:
+      readOnly: true
+      type: object
+      properties:
+        items:
+          type: array
+          nullable: false
+          items:
+            $ref: '#/components/schemas/TriggerResponse'
+        currentPage:
+          type: integer
+          format: int32
+          nullable: false
+        count:
+          type: integer
+          format: int32
+          nullable: false
+        lastPage:
+          type: integer
+          format: int32
+          nullable: false
+        total:
+          type: integer
+          format: int64
+          nullable: false
+        links:
+          $ref: 'external_api_common_components.yaml#/components/schemas/PaginationLinks'
