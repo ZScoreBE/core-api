@@ -5,7 +5,6 @@ import be.zsoft.zscore.core.entity.trigger.TriggerCostType;
 import be.zsoft.zscore.core.entity.trigger.TriggerRewardType;
 import lombok.experimental.UtilityClass;
 
-import java.util.Map;
 import java.util.UUID;
 
 @UtilityClass
@@ -18,8 +17,10 @@ public class TriggerResponseFixture {
                 "LVS",
                 TriggerCostType.FREE,
                 TriggerRewardType.LIVES,
-                Map.of(),
-                Map.of("amount", Integer.toString(10))
+                null,
+                null,
+                10,
+                null
         );
     }
 }

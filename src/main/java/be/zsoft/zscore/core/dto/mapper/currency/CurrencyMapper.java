@@ -6,6 +6,8 @@ import be.zsoft.zscore.core.entity.currency.Currency;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class CurrencyMapper {
 
@@ -30,5 +32,9 @@ public class CurrencyMapper {
 
     public Page<CurrencyResponse> toResponse(Page<Currency> currencies) {
         return currencies.map(this::toResponse);
+    }
+
+    public List<CurrencyResponse> toResponse(List<Currency> currencies) {
+        return currencies.stream().map(this::toResponse).toList();
     }
 }

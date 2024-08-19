@@ -24,7 +24,5 @@
     <include file="db/changelog/v1.1.0/05-player_life_settings.xml" relativeToChangelogFile="false" />
     <include file="db/changelog/v1.1.0/06-player_life_columns.xml" relativeToChangelogFile="false" />
     <include file="db/changelog/v1.1.0/07-triggers.xml" relativeToChangelogFile="false" />
-    <include file="db/changelog/v1.1.0/08-trigger_cost_meta_data.xml" relativeToChangelogFile="false" />
-    <include file="db/changelog/v1.1.0/09-trigger_reward_meta_data.xml" relativeToChangelogFile="false" />
 
 </databaseChangeLog>

@@ -5,7 +5,7 @@ import be.zsoft.zscore.core.entity.trigger.TriggerCostType;
 import be.zsoft.zscore.core.entity.trigger.TriggerRewardType;
 import lombok.experimental.UtilityClass;
 
-import java.util.Map;
+import java.util.UUID;
 
 @UtilityClass
 public class TriggerRequestFixture {
@@ -15,42 +15,50 @@ public class TriggerRequestFixture {
                 "Give Lives",
                 "LVS",
                 TriggerCostType.FREE,
+                null,
+                null,
                 TriggerRewardType.LIVES,
-                Map.of(),
-                Map.of("amount", Integer.toString(10))
+                10,
+                null
         );
     }
 
-    public static TriggerRequest aCurrencyCostTriggerWithCostMetadata(Map<String, String> metadata) {
+    public static TriggerRequest aCurrencyCostTriggerWithCostMetadata(Integer amount, UUID currencyId) {
         return new TriggerRequest(
                 "Give Lives",
                 "LVS",
                 TriggerCostType.CURRENCY,
+                amount,
+                currencyId,
                 TriggerRewardType.LIVES,
-                metadata,
-                Map.of()
+                null,
+                null
         );
     }
 
-    public static TriggerRequest aLivesRewardWithRewardMetadata(Map<String, String> metadata) {
+    public static TriggerRequest aLivesRewardWithRewardMetadata(Integer amount) {
         return new TriggerRequest(
                 "Give Lives",
                 "LVS",
                 TriggerCostType.FREE,
+                null,
+                null,
                 TriggerRewardType.LIVES,
-                Map.of(),
-                metadata
+                amount,
+                null
         );
     }
 
-    public static TriggerRequest aCurrencyRewardWithRewardMetadata(Map<String, String> metadata) {
+    public static TriggerRequest aCurrencyRewardWithRewardMetadata(Integer amount, UUID currencyId) {
         return new TriggerRequest(
                 "Give currency",
                 "CRNCY",
                 TriggerCostType.FREE,
+                null,
+                null,
                 TriggerRewardType.CURRENCY,
-                Map.of(),
-                metadata
+                amount,
+                currencyId
         );
     }
 }

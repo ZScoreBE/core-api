@@ -67,6 +67,15 @@ public class CurrencyController {
         );
     }
 
+    @GetMapping("/all")
+    @Secured("ROLE_USER")
+    public List<CurrencyResponse> getAllCurrencies(@PathVariable UUID gameId) {
+        Game game = gameService.getById(gameId);
+        List<Currency> currencies = currencyService.getAllCurrenciesByGame(game);
+
+        return currencyMapper.toResponse(currencies);
+    }
+
     @GetMapping("/{id}")
     @Secured("ROLE_USER")
     public CurrencyResponse getCurrency(

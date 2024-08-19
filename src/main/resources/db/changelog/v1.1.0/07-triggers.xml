@@ -24,8 +24,24 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="cost_amount" type="INTEGER">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="cost_currency_id" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+
             <column name="reward_type" type="VARCHAR(255)">
                 <constraints nullable="false"/>
+            </column>
+
+            <column name="reward_amount" type="INTEGER">
+                <constraints nullable="true"/>
+            </column>
+
+            <column name="reward_currency_id" type="VARCHAR(255)">
+                <constraints nullable="true"/>
             </column>
 
             <column name="game_id" type="VARCHAR(255)">
@@ -43,6 +59,12 @@
     </changeSet>
 
     <changeSet id="07-02-triggers-relations" author="wout">
+        <addForeignKeyConstraint baseTableName="triggers" baseColumnNames="reward_currency_id"
+                                 constraintName="fk_triggers_cost_currency"
+                                 referencedTableName="currencies" referencedColumnNames="id" />
+        <addForeignKeyConstraint baseTableName="triggers" baseColumnNames="cost_currency_id"
+                                 constraintName="fk_triggers_reward_currency"
+                                 referencedTableName="currencies" referencedColumnNames="id" />
         <addForeignKeyConstraint baseTableName="triggers" baseColumnNames="game_id"
                                  constraintName="fk_triggers_game"
                                  referencedTableName="games" referencedColumnNames="id" />
@@ -54,7 +76,11 @@
             <column name="name" type="string"/>
             <column name="key_code" type="string"/>
             <column name="cost_type" type="string"/>
+            <column name="cost_amount" type="integer"/>
+            <column name="cost_currency_id" type="string"/>
             <column name="reward_type" type="string"/>
+            <column name="reward_amount" type="integer"/>
+            <column name="reward_currency_idt" type="string"/>
             <column name="game_id" type="string"/>
         </loadData>
     </changeSet>

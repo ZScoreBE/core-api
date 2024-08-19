@@ -7,6 +7,7 @@ import be.zsoft.zscore.core.entity.currency.Currency;
 import be.zsoft.zscore.core.entity.player.Player;
 import be.zsoft.zscore.core.service.achievement.AchievementProgressService;
 import be.zsoft.zscore.core.service.currency.CurrencyService;
+import be.zsoft.zscore.core.service.game.GameService;
 import be.zsoft.zscore.core.service.player.PlayerService;
 import be.zsoft.zscore.core.service.wallet.WalletService;
 import jakarta.transaction.Transactional;
@@ -28,6 +29,7 @@ public class ExternalPlayerController {
     private final AchievementProgressService achievementProgressService;
     private final CurrencyService currencyService;
     private final WalletService walletService;
+    private final GameService gameService;
 
     @Secured({"ROLE_API"})
     @PostMapping
@@ -38,7 +40,7 @@ public class ExternalPlayerController {
         Player player = playerService.createPlayer(request);
         achievementProgressService.createAchievementProgressesForNewPlayer(player);
 
-        List<Currency> currencies = currencyService.getAllCurrenciesByAuthenticatedGame();
+        List<Currency> currencies = currencyService.getAllCurrenciesByGame(gameService.getAuthenicatedGame());
         walletService.createWallets(currencies, player);
 
         return playerMapper.toResponse(player);

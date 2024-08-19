@@ -89,4 +89,29 @@ class CurrencyMapperTest {
 
         assertEquals(expected, result);
     }
+
+    @Test
+    void toResponse_list() {
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
+        Currency currency1 = Currency.builder()
+                .id(id1)
+                .name("GOLD")
+                .key("GLD")
+                .build();
+        Currency currency2 = Currency.builder()
+                .id(id2)
+                .name("EMERALD")
+                .key("EMR")
+                .build();
+        List<Currency> currencies = List.of(currency1, currency2);
+        List<CurrencyResponse> expected = List.of(
+                new CurrencyResponse(id1, "GOLD", "GLD"),
+                new CurrencyResponse(id2, "EMERALD", "EMR")
+        );
+
+        List<CurrencyResponse> result = currencyMapper.toResponse(currencies);
+
+        assertEquals(expected, result);
+    }
 }

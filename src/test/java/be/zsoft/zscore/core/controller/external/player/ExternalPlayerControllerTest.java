@@ -4,13 +4,16 @@ import be.zsoft.zscore.core.dto.mapper.player.PlayerMapper;
 import be.zsoft.zscore.core.dto.request.player.PlayerRequest;
 import be.zsoft.zscore.core.dto.response.player.PlayerResponse;
 import be.zsoft.zscore.core.entity.currency.Currency;
+import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.entity.player.Player;
 import be.zsoft.zscore.core.fixtures.currency.CurrencyFixture;
+import be.zsoft.zscore.core.fixtures.game.GameFixture;
 import be.zsoft.zscore.core.fixtures.player.PlayerFixture;
 import be.zsoft.zscore.core.fixtures.player.PlayerRequestFixtures;
 import be.zsoft.zscore.core.fixtures.player.PlayerResponseFixture;
 import be.zsoft.zscore.core.service.achievement.AchievementProgressService;
 import be.zsoft.zscore.core.service.currency.CurrencyService;
+import be.zsoft.zscore.core.service.game.GameService;
 import be.zsoft.zscore.core.service.player.PlayerService;
 import be.zsoft.zscore.core.service.wallet.WalletService;
 import org.junit.jupiter.api.Test;
@@ -43,11 +46,15 @@ class ExternalPlayerControllerTest {
     @Mock
     private WalletService walletService;
 
+    @Mock
+    private GameService gameService;
+
     @InjectMocks
     private ExternalPlayerController externalPlayerController;
 
     @Test
     void createPlayer() {
+        Game game = GameFixture.aDefaultGame();
         PlayerRequest request = PlayerRequestFixtures.aDefaultPlayerRequest();
         Player player = PlayerFixture.aDefaultPlayer();
         List<Currency> currencies = List.of(
@@ -57,7 +64,8 @@ class ExternalPlayerControllerTest {
         PlayerResponse expected = PlayerResponseFixture.aDefaultPlayerResponse();
 
         when(playerService.createPlayer(request)).thenReturn(player);
-        when(currencyService.getAllCurrenciesByAuthenticatedGame()).thenReturn(currencies);
+        when(gameService.getAuthenicatedGame()).thenReturn(game);
+        when(currencyService.getAllCurrenciesByGame(game)).thenReturn(currencies);
         when(playerMapper.toResponse(player)).thenReturn(expected);
 
         PlayerResponse result = externalPlayerController.createPlayer(request);
@@ -65,8 +73,9 @@ class ExternalPlayerControllerTest {
         assertEquals(expected, result);
 
         verify(playerService).createPlayer(request);
+        verify(gameService).getAuthenicatedGame();
         verify(achievementProgressService).createAchievementProgressesForNewPlayer(player);
-        verify(currencyService).getAllCurrenciesByAuthenticatedGame();
+        verify(currencyService).getAllCurrenciesByGame(game);
         verify(walletService).createWallets(currencies, player);
         verify(playerMapper).toResponse(player);
     }

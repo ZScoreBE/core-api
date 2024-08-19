@@ -21,7 +21,7 @@ public class TriggerService {
     private final TriggerMapper triggerMapper;
 
     public Trigger createTrigger(TriggerRequest request, Game game) {
-        Trigger trigger = triggerMapper.fromRequest(request);
+        Trigger trigger = triggerMapper.fromRequest(request, game);
         trigger.setGame(game);
 
         return triggerRepo.saveAndFlush(trigger);
@@ -42,7 +42,7 @@ public class TriggerService {
 
     public Trigger updateTrigger(TriggerRequest request, UUID id, Game game) {
         Trigger trigger = getTriggerByIdAndGame(id, game);
-        trigger = triggerMapper.fromRequest(request, trigger);
+        trigger = triggerMapper.fromRequest(request, game, trigger);
 
         return triggerRepo.saveAndFlush(trigger);
     }

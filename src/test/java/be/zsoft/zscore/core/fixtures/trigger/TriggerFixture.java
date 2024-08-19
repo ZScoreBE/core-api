@@ -5,7 +5,6 @@ import be.zsoft.zscore.core.entity.trigger.TriggerCostType;
 import be.zsoft.zscore.core.entity.trigger.TriggerRewardType;
 import lombok.experimental.UtilityClass;
 
-import java.util.Map;
 import java.util.UUID;
 
 @UtilityClass
@@ -17,9 +16,8 @@ public class TriggerFixture {
                 .name("Give lives")
                 .key("LVS")
                 .costType(TriggerCostType.FREE)
-                .rewardType(TriggerRewardType.CURRENCY)
-                .costMetaData(Map.of())
-                .rewardMetaData(Map.of("amount", Integer.toString(10)))
+                .rewardType(TriggerRewardType.LIVES)
+                .rewardAmount(10)
                 .build();
     }
 }

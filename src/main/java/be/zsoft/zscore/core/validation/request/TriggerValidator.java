@@ -7,8 +7,6 @@ import be.zsoft.zscore.core.entity.trigger.TriggerCostType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @RequiredArgsConstructor
 @Component
 public class TriggerValidator {
@@ -18,37 +16,37 @@ public class TriggerValidator {
 
     public void validate(TriggerRequest request) {
         if (request.costType() == TriggerCostType.CURRENCY) {
-            validateCurrencyCostMetadata(request.costMetaData());
+            validateCurrencyCostMetadata(request);
         }
 
         switch (request.rewardType()) {
-            case LIVES -> validateLivesRewardMetadata(request.rewardMetaData());
-            case CURRENCY -> validateCurrencyRewardMetadata(request.rewardMetaData());
+            case LIVES -> validateLivesRewardMetadata(request);
+            case CURRENCY -> validateCurrencyRewardMetadata(request);
         }
     }
 
-    private void validateCurrencyCostMetadata(Map<String, String> metaData) {
-        if (!metaData.containsKey(CURRENCY_ID_KEY)) {
+    private void validateCurrencyCostMetadata(TriggerRequest request) {
+        if (request.costCurrencyId() == null) {
             throw new ApiException(ErrorCodes.TRIGGER_NO_CURRENCY_ID_COST_META_DATA);
         }
 
-        if (!metaData.containsKey(AMOUNT_KEY)) {
+        if (request.costAmount() == null) {
             throw new ApiException(ErrorCodes.TRIGGER_NO_AMOUNT_COST_META_DATA);
         }
     }
 
-    private void validateLivesRewardMetadata(Map<String, String> metaData) {
-        if (!metaData.containsKey(AMOUNT_KEY)) {
+    private void validateLivesRewardMetadata(TriggerRequest request) {
+        if (request.rewardAmount() == null) {
             throw new ApiException(ErrorCodes.TRIGGER_NO_AMOUNT_REWARD_META_DATA);
         }
     }
 
-    private void validateCurrencyRewardMetadata(Map<String, String> metaData) {
-        if (!metaData.containsKey(CURRENCY_ID_KEY)) {
+    private void validateCurrencyRewardMetadata(TriggerRequest request) {
+        if (request.rewardCurrencyId() == null) {
             throw new ApiException(ErrorCodes.TRIGGER_NO_CURRENCY_ID_REWARD_META_DATA);
         }
 
-        if (!metaData.containsKey(AMOUNT_KEY)) {
+        if (request.rewardAmount() == null) {
             throw new ApiException(ErrorCodes.TRIGGER_NO_AMOUNT_REWARD_META_DATA);
         }
     }

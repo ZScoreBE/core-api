@@ -6,7 +6,6 @@ import be.zsoft.zscore.core.dto.request.currency.CurrencyRequest;
 import be.zsoft.zscore.core.entity.currency.Currency;
 import be.zsoft.zscore.core.entity.game.Game;
 import be.zsoft.zscore.core.repository.currency.CurrencyRepo;
-import be.zsoft.zscore.core.service.game.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +20,6 @@ public class CurrencyService {
 
     private final CurrencyMapper currencyMapper;
     private final CurrencyRepo currencyRepo;
-    private final GameService gameService;
 
     public Currency createCurrency(Game game, CurrencyRequest request) {
         Currency currency = currencyMapper.fromRequest(request);
@@ -38,8 +36,8 @@ public class CurrencyService {
         return currencyRepo.searchAllOnNameOrKeyByGame("%" + search.toLowerCase() + "%", game, pageable);
     }
 
-    public List<Currency> getAllCurrenciesByAuthenticatedGame() {
-        return currencyRepo.findAllByGame(gameService.getAuthenicatedGame());
+    public List<Currency> getAllCurrenciesByGame(Game game) {
+        return currencyRepo.findAllByGame(game);
     }
 
     public Currency getCurrencyById(Game game, UUID id) {

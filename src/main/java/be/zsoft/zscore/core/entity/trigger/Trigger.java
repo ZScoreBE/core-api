@@ -1,6 +1,7 @@
 package be.zsoft.zscore.core.entity.trigger;
 
 import be.zsoft.zscore.core.entity.BaseEntity;
+import be.zsoft.zscore.core.entity.currency.Currency;
 import be.zsoft.zscore.core.entity.game.Game;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,7 +9,6 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Types;
-import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -38,21 +38,23 @@ public class Trigger extends BaseEntity {
     @Column(name = "cost_type", nullable = false)
     private TriggerCostType costType;
 
-    @ElementCollection
-    @MapKeyColumn(name="name")
-    @Column(name="value")
-    @CollectionTable(name="trigger_cost_meta_data", joinColumns=@JoinColumn(name="trigger_id"))
-    private Map<String, String> costMetaData;
+    @Column(name = "cost_amount", nullable = true)
+    private Integer costAmount;
+
+    @ManyToOne
+    @JoinColumn(name = "cost_currency_id", nullable = true)
+    private Currency costCurrency;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "reward_type", nullable = false)
     private TriggerRewardType rewardType;
 
-    @ElementCollection
-    @MapKeyColumn(name="name")
-    @Column(name="value")
-    @CollectionTable(name="trigger_reward_meta_data", joinColumns=@JoinColumn(name="trigger_id"))
-    private Map<String, String> rewardMetaData;
+    @Column(name = "reward_amount", nullable = true)
+    private Integer rewardAmount;
+
+    @ManyToOne
+    @JoinColumn(name = "reward_currency_id", nullable = true)
+    private Currency rewardCurrency;
 
     @ManyToOne
     @JoinColumn(name = "game_id", nullable = false)

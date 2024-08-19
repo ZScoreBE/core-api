@@ -51,12 +51,12 @@ class TriggerServiceTest {
         TriggerRequest request = TriggerRequestFixture.aDefaultTriggerRequest();
         Trigger expected = TriggerFixture.aDefaultTrigger();
 
-        when(triggerMapper.fromRequest(request)).thenReturn(expected);
+        when(triggerMapper.fromRequest(request, game)).thenReturn(expected);
         when(triggerRepo.saveAndFlush(expected)).thenReturn(expected);
 
         Trigger result = triggerService.createTrigger(request, game);
 
-        verify(triggerMapper).fromRequest(request);
+        verify(triggerMapper).fromRequest(request, game);
         verify(triggerRepo).saveAndFlush(triggerArgumentCaptor.capture());
 
         assertEquals(expected, result);
@@ -134,13 +134,13 @@ class TriggerServiceTest {
         Trigger expected = TriggerFixture.aDefaultTrigger();
 
         when(triggerRepo.findByIdAndGame(id, game)).thenReturn(Optional.of(expected));
-        when(triggerMapper.fromRequest(request, expected)).thenReturn(expected);
+        when(triggerMapper.fromRequest(request, game, expected)).thenReturn(expected);
         when(triggerRepo.saveAndFlush(expected)).thenReturn(expected);
 
         Trigger result = triggerService.updateTrigger(request, id, game);
 
         verify(triggerRepo).findByIdAndGame(id, game);
-        verify(triggerMapper).fromRequest(request, expected);
+        verify(triggerMapper).fromRequest(request, game, expected);
         verify(triggerRepo).saveAndFlush(expected);
 
         assertEquals(expected, result);

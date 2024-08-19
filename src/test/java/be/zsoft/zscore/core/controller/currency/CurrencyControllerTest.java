@@ -80,6 +80,32 @@ class CurrencyControllerTest {
     }
 
     @Test
+    void getAllCurrencies() {
+        UUID gameId = UUID.randomUUID();
+        Game game = GameFixture.aDefaultGame();
+        List<Currency> currencies = List.of(
+                CurrencyFixture.aDefaultCurrency(),
+                CurrencyFixture.aDefaultCurrency()
+        );
+        List<CurrencyResponse> expected = List.of(
+                CurrencyResponseFixture.aDefaultCurrencyResponse(),
+                CurrencyResponseFixture.aDefaultCurrencyResponse()
+        );
+
+        when(gameService.getById(gameId)).thenReturn(game);
+        when(currencyService.getAllCurrenciesByGame(game)).thenReturn(currencies);
+        when(currencyMapper.toResponse(currencies)).thenReturn(expected);
+
+        List<CurrencyResponse> result = currencyController.getAllCurrencies(gameId);
+
+        verify(gameService).getById(gameId);
+        verify(currencyService).getAllCurrenciesByGame(game);
+        verify(currencyMapper).toResponse(currencies);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
     void getCurrencies() {
         UUID gameId = UUID.randomUUID();
         Game game = GameFixture.aDefaultGame();
