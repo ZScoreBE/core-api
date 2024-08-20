@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: External API
+  description: Rest API to use in your games
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /external/currencies:
+    get:
+      summary: Get currencies
+      operationId: getCurrencies
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - $ref: './external_api_common_components.yaml#/components/parameters/pageQueryParam'
+        - $ref: './external_api_common_components.yaml#/components/parameters/sizeQueryParam'
+      responses:
+        200:
+          description: The currencies for a game
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyResponseList'
+
+  /external/currencies/{id}/offers:
+    get:
+      summary: Get offers by currency
+      operationId: getCurrencyOffers
+      parameters:
+        - $ref: 'external_api_common_components.yaml#/components/parameters/BearerJwtAuth'
+        - $ref: './external_api_common_components.yaml#/components/parameters/pageQueryParam'
+        - $ref: './external_api_common_components.yaml#/components/parameters/sizeQueryParam'
+        - in: path
+          name: id
+          required: true
+          description: The currency ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: The offers for a currency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyOfferResponseList'
+
+components:
+  schemas:
+    CurrencyResponse:
+      readOnly: true
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        key:
+          type: string
+          nullable: false
+
+    CurrencyOfferResponse:
+      readOnly: true
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        key:
+          type: string
+          nullable: false
+        amount:
+          type: integer
+          format: int32
+          nullable: false
+        priceEx:
+          type: number
+          format: double
+          nullable: false
+        discountPriceEx:
+          type: number
+          format: double
+          nullable: true
+
+    CurrencyResponseList:
+      readOnly: true
+      type: object
+      properties:
+        items:
+          type: array
+          nullable: false
+          items:
+            $ref: '#/components/schemas/CurrencyResponse'
+        currentPage:
+          type: integer
+          format: int32
+          nullable: false
+        count:
+          type: integer
+          format: int32
+          nullable: false
+        lastPage:
+          type: integer
+          format: int32
+          nullable: false
+        total:
+          type: integer
+          format: int64
+          nullable: false
+        links:
+          $ref: 'external_api_common_components.yaml#/components/schemas/PaginationLinks'
+
+    CurrencyOfferResponseList:
+      readOnly: true
+      type: object
+      properties:
+        items:
+          type: array
+          nullable: false
+          items:
+            $ref: '#/components/schemas/CurrencyOfferResponse'
+        currentPage:
+          type: integer
+          format: int32
+          nullable: false
+        count:
+          type: integer
+          format: int32
+          nullable: false
+        lastPage:
+          type: integer
+          format: int32
+          nullable: false
+        total:
+          type: integer
+          format: int64
+          nullable: false
+        links:
+          $ref: 'external_api_common_components.yaml#/components/schemas/PaginationLinks'
