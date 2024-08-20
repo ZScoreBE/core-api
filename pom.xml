@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>be.zsoft.zscore</groupId>
 	<artifactId>core</artifactId>
-	<version>0.0.5</version>
+	<version>1.0.0</version>
 	<name>core-api</name>
 	<description>core-api</description>
 
