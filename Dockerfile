@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk
+FROM amazoncorretto:24-jdk
 
 WORKDIR /app
 
