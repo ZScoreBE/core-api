@@ -18,7 +18,7 @@ jobs:
       - name: Set up Java for building
         uses: actions/setup-java@v3
         with:
-          java-version: 21
+          java-version: 24
           distribution: 'temurin'
           cache: maven
 
