@@ -9,7 +9,7 @@
     <changeSet id="04-01-wallet_operations-table" author="wout">
         <createTable tableName="wallet_operations">
             <column name="id" type="VARCHAR(255)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_achievement"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_wallet_operation"/>
             </column>
 
             <column name="amount" type="INTEGER">

@@ -9,7 +9,7 @@
     <changeSet id="01-01-currencies-table" author="wout">
         <createTable tableName="currencies">
             <column name="id" type="VARCHAR(255)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_achievement"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_currency"/>
             </column>
 
             <column name="name" type="VARCHAR(255)">
