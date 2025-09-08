@@ -16,7 +16,7 @@ public interface GameRepo extends JpaRepository<Game, UUID> {
     @Query("SELECT g FROM Game g WHERE g.organization = :organization ORDER BY g.name ASC")
     List<Game> findAllGamesByOrganization(Organization organization);
 
-    @Query("SELECT count(g) > 0 FROM Game g WHERE g.sandboxMode = true AND g.organization = :organization ORDER BY g.name ASC")
+    @Query("SELECT count(g) > 0 FROM Game g WHERE g.sandboxMode = true AND g.organization = :organization")
     boolean doesOrganizationHaveGames(Organization organization);
 
     @Query("SELECT g FROM Game g WHERE g.generationId = :generationId")
